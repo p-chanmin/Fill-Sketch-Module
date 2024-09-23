@@ -1,4 +1,4 @@
-package com.dev.philo.fillsketch_princess
+package com.dev.philo.fillsketch
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

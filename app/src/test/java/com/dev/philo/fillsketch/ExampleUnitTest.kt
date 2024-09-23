@@ -1,4 +1,4 @@
-package com.dev.philo.fillsketch_princess
+package com.dev.philo.fillsketch
 
 import org.junit.Test
 

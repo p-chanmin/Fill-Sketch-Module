@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.dev.philo.fillsketch_princess"
+    namespace = "com.dev.philo.fillsketch"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.dev.philo.fillsketch_princess"
+        applicationId = "com.dev.philo.fillsketch"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

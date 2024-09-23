@@ -21,7 +21,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Fill Sketch_Princess"
+rootProject.name = "Fill Sketch"
 include(":app")
 
 include(":feature:main")

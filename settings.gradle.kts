@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -11,6 +12,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -21,3 +23,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "Fill Sketch_Princess"
 include(":app")
+
+include(":feature:main")
+
+include(":core:model")
+include(":core:designsystem")
+include(":core:navigation")
+include(":feature:home")
+include(":feature:drawing")

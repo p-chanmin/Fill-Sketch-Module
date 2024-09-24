@@ -52,8 +52,6 @@ fun HomeScreen(
 ) {
     Box(
         modifier = Modifier
-            .systemBarsPadding()
-            .navigationBarsPadding()
             .fillMaxSize()
             .background(Color.Cyan)
     ) {

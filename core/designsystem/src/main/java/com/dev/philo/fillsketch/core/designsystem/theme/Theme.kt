@@ -14,22 +14,21 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val ColorScheme = lightColorScheme(
-    primary = LightBlue,
-    onPrimary = Black,
+    primary = Sunset,
+    onPrimary = White,
     primaryContainer = Aero,
     onPrimaryContainer = Black,
-    background = Alabaster,
-    onBackground = Black,
-    onSurface = DarkGray,
-    surfaceContainer = DuskGray,
+    background = TiffanyBlue,
+    onBackground = White,
+    onSurface = Aquamarine,
+    surfaceContainer = TiffanyBlue,
     secondary = Khaki,
     onSecondary = Black,
     secondaryContainer = Dun,
     onSecondaryContainer = Black,
-    tertiary = DimGray,
-    onTertiary = White,
-    error = Red02,
-    outline = White,
+    tertiary = SandyBrown1,
+    onTertiary = Black,
+    outline = SandyBronw2,
     scrim = Black.copy(alpha = 0.30f)
 )
 

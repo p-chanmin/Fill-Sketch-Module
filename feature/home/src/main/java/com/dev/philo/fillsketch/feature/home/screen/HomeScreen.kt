@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,11 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchMainButton
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.feature.home.viewmodel.HomeViewModel
 import kotlin.math.roundToInt
 import com.dev.philo.fillsketch.asset.R as AssetR
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
@@ -46,8 +50,12 @@ fun HomeScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     navigateToSketchList: () -> Unit,
-    navigateToMyWorks: () -> Unit
+    navigateToMyWorks: () -> Unit,
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+
+    val homeUiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -70,14 +78,22 @@ fun HomeScreen(
         ) {
             FillSketchSettingButton(
                 modifier = Modifier.size(60.dp),
-                painter = painterResource(id = DesignSystemR.drawable.ic_se_on),
-                onClick = {}
+                painter = if (homeUiState.setting.soundEffect) {
+                    painterResource(id = DesignSystemR.drawable.ic_se_on)
+                } else {
+                    painterResource(id = DesignSystemR.drawable.ic_se_off)
+                },
+                onClick = { homeViewModel.updateSoundEffectSetting() }
             )
 
             FillSketchSettingButton(
                 modifier = Modifier.size(60.dp),
-                painter = painterResource(id = DesignSystemR.drawable.ic_bgm_on),
-                onClick = {}
+                painter = if (homeUiState.setting.backgroundMusic) {
+                    painterResource(id = DesignSystemR.drawable.ic_bgm_on)
+                } else {
+                    painterResource(id = DesignSystemR.drawable.ic_bgm_off)
+                },
+                onClick = { homeViewModel.updateBackgroundMusicSetting() }
             )
 
             FillSketchSettingButton(
@@ -103,11 +119,17 @@ fun HomeScreen(
         }
 
         Box(
-            modifier = Modifier.align(Alignment.Center).padding(top = 120.dp).fillMaxSize(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(top = 120.dp)
+                .fillMaxSize(),
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter)
-                    .rotate(-3f).offset { IntOffset(0, titleOffset.value.roundToInt()) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.TopCenter)
+                    .rotate(-3f)
+                    .offset { IntOffset(0, titleOffset.value.roundToInt()) },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
@@ -140,7 +162,9 @@ fun HomeScreen(
                 )
             }
             Image(
-                modifier = Modifier.fillMaxSize().padding(top = 100.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 100.dp),
                 painter = painterResource(
                     id = AssetR.drawable.img_home_character
                 ),

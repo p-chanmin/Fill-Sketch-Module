@@ -54,5 +54,15 @@ gradlePlugin {
             id = "philo.fillsketch.android.kotlin.serialization"
             implementationClass = "AndroidKotlinSerializationConventionPlugin"
         }
+
+        register("androidRealm") {
+            id = "philo.fillsketch.android.realm"
+            implementationClass = "AndroidRealmConventionPlugin"
+        }
+
+        register("androidGson") {
+            id = "philo.fillsketch.android.gson"
+            implementationClass = "AndroidGsonConventionPlugin"
+        }
     }
 }

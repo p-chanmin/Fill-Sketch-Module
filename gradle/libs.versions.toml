@@ -20,8 +20,14 @@ androidxComposeBom = "2024.06.00"
 androidxComposeNavigation = "2.8.0-beta02"
 androidxComposeMaterial3 = "1.2.1"
 
+## RealmDB
+realmDB = "2.0.0"
+
 ## Coil
 coil = "2.5.0"
+
+## GSON
+gson = "2.10.1"
 
 ## Kotlin Symbol Processing
 ksp = "2.0.0-1.0.22"
@@ -85,6 +91,11 @@ coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutine" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutine" }
 
+realm-library-base = { group = "io.realm.kotlin", name = "library-base", version.ref = "realmDB" }
+realm-library-sync = { group = "io.realm.kotlin", name = "library-sync", version.ref = "realmDB" }
+
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 coil-video = { group = "io.coil-kt", name = "coil-video", version.ref = "coil" }
 
@@ -102,3 +113,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+realm-database = { id = "io.realm.kotlin", version.ref = "realmDB" }

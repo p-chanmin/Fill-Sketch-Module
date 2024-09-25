@@ -31,18 +31,18 @@ val Typography = Typography(
     ),
     bodyLarge = TextStyle(
         fontFamily = dunggeunmiso,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Normal
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold
     ),
     bodyMedium = TextStyle(
         fontFamily = dunggeunmiso,
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Normal
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
     ),
     bodySmall = TextStyle(
         fontFamily = dunggeunmiso,
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Normal
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold
     ),
     labelLarge = TextStyle(
         fontFamily = dunggeunmiso,

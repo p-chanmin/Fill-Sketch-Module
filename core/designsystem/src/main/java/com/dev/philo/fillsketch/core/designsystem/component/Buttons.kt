@@ -3,10 +3,15 @@ package com.dev.philo.fillsketch.core.designsystem.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -14,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -89,8 +95,10 @@ fun FillSketchMainButton(
 @Composable
 fun FillSketchSettingButton(
     modifier: Modifier = Modifier,
-    painter: Painter,
+    painter: Painter? = null,
     contentDescription: String? = null,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    text: String? = null,
     onClick: () -> Unit
 ) {
     Surface(
@@ -101,20 +109,39 @@ fun FillSketchSettingButton(
                 shape = RoundedCornerShape(20.dp)
             )
             .clickable { onClick() },
-        color = MaterialTheme.colorScheme.onSurface,
+        color = color,
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp,
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .padding(Paddings.large)
-                .fillMaxSize()
+                .fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painter,
-                contentDescription = contentDescription,
-                contentScale = ContentScale.Crop
-            )
+            painter?.let {
+                Image(
+                    painter = painter,
+                    contentDescription = contentDescription,
+                    contentScale = ContentScale.Fit
+                )
+            }
+
+            text?.let {
+                OutlinedText(
+                    modifier = Modifier
+                        .padding(start = Paddings.large),
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    outlineColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    outlineDrawStyle = Stroke(
+                        width = 12f
+                    )
+                )
+            }
         }
     }
 }
@@ -165,6 +192,31 @@ private fun FillSketchSettingButtonPreview() {
         FillSketchSettingButton(
             modifier = Modifier.size(60.dp),
             painter = painterResource(id = R.drawable.ic_setting),
+            onClick = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun FillSketchSettingButton1Preview() {
+    FillSketchTheme {
+        FillSketchSettingButton(
+            modifier = Modifier.height(60.dp).width(200.dp),
+            painter = painterResource(id = R.drawable.ic_setting),
+            onClick = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun FillSketchSettingButton2Preview() {
+    FillSketchTheme {
+        FillSketchSettingButton(
+            modifier = Modifier.height(60.dp).fillMaxWidth(),
+            painter = painterResource(id = R.drawable.ic_ads),
+            text = "Unlock by watching an ADs",
             onClick = {}
         )
     }

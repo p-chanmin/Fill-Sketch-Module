@@ -41,9 +41,9 @@ class ColorSetTypeAdapter : JsonSerializer<ColorSet>, JsonDeserializer<ColorSet>
 
     override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ColorSet {
         val jsonObject = json.asJsonObject
-        val r = jsonObject.get("r").asFloat
-        val g = jsonObject.get("g").asFloat
-        val b = jsonObject.get("b").asFloat
+        val r = jsonObject.get("r").asInt
+        val g = jsonObject.get("g").asInt
+        val b = jsonObject.get("b").asInt
         return ColorSet(r, g, b)
     }
 }
@@ -92,7 +92,7 @@ class PathWrapperAdapter : JsonSerializer<PathWrapper>, JsonDeserializer<PathWra
                 Offset(it.asJsonObject.get("x").asFloat, it.asJsonObject.get("y").asFloat)
             },
             strokeColor = jsonObject.getAsJsonObject("strokeColor").let { colorJsonObject ->
-                ColorSet(colorJsonObject.get("r").asFloat, colorJsonObject.get("g").asFloat, colorJsonObject.get("b").asFloat)
+                ColorSet(colorJsonObject.get("r").asInt, colorJsonObject.get("g").asInt, colorJsonObject.get("b").asInt)
             },
             strokeWidth = jsonObject.get("strokeWidth").asFloat,
             alpha = jsonObject.get("alpha").asFloat

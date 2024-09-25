@@ -6,9 +6,9 @@ data class Offset(
 )
 
 data class ColorSet(
-    val r: Float,
-    val g: Float,
-    val b: Float,
+    val r: Int,
+    val g: Int,
+    val b: Int,
 )
 
 data class PathWrapper(

@@ -52,6 +52,7 @@ fun NavGraphBuilder.drawingNavGraph(
             sketchType = sketchType,
             drawingResultId = drawingResultId,
             onShowErrorSnackBar = onShowErrorSnackBar,
+            onBackClick = onBackClick,
             navigateToDrawing = navigateToDrawing,
             navigateToMyWorks = navigateToMyWorks
         )

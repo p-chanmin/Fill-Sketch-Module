@@ -130,7 +130,7 @@ fun FillSketchSettingButton(
 
             text?.let {
                 OutlinedText(
-                    textModifier = Modifier
+                    modifier = Modifier
                         .padding(start = Paddings.large),
                     text = text,
                     style = MaterialTheme.typography.bodySmall.copy(

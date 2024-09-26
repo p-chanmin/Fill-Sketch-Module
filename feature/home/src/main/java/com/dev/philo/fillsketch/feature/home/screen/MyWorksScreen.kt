@@ -1,59 +1,225 @@
 package com.dev.philo.fillsketch.feature.home.screen
 
-import androidx.compose.foundation.layout.Box
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
+import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
+import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
+import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
+import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
+import com.dev.philo.fillsketch.feature.home.model.MyWork
+import com.dev.philo.fillsketch.feature.home.model.MyWorksUiState
+import com.dev.philo.fillsketch.feature.home.viewmodel.MyWorksViewModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
+import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
 @Composable
 fun MyWorksScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit
+    navigateToDrawingResult: (Int, Int) -> Unit,
+    myWorksViewModel: MyWorksViewModel = hiltViewModel()
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
+    val myWorksUiState by myWorksViewModel.myWorksUiState.collectAsStateWithLifecycle()
+
+    MyWorksContent(
+        myWorksUiState = myWorksUiState,
+        onBackClick = onBackClick,
+        navigateToDrawingResult = navigateToDrawingResult,
+        deleteMyWork = myWorksViewModel::deleteMyWork
+    )
+}
+
+@Composable
+fun MyWorksContent(
+    myWorksUiState: MyWorksUiState,
+    onBackClick: () -> Unit,
+    navigateToDrawingResult: (Int, Int) -> Unit,
+    deleteMyWork: (Int) -> Unit,
+) {
+    val lazyGridState = rememberLazyGridState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        Column(
-            modifier = Modifier.align(Alignment.Center)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Paddings.xlarge, start = Paddings.large, end = Paddings.large),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "나의 작업물 화면"
+            FillSketchSettingButton(
+                modifier = Modifier
+                    .size(60.dp),
+                painter = painterResource(id = DesignSystemR.drawable.ic_left),
+                onClick = { onBackClick() }
             )
 
-            Button(
-                onClick = { onBackClick() }
+            OutlinedText(
+                textModifier = Modifier,
+                text = "My Works",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontSize = 35.sp,
+                    color = MaterialTheme.colorScheme.tertiary
+                ),
+                outlineColor = MaterialTheme.colorScheme.onTertiary,
+                outlineDrawStyle = Stroke(
+                    width = 15f
+                )
+            )
+        }
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Paddings.extra),
+            shape = RoundedCornerShape(20.dp),
+            shadowElevation = 4.dp,
+            color = MaterialTheme.colorScheme.secondary
+        ) {
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(Paddings.large),
+                state = lazyGridState,
+                columns = GridCells.Adaptive(minSize = 140.dp),
+                verticalArrangement = Arrangement.spacedBy(Paddings.medium),
+                horizontalArrangement = Arrangement.spacedBy(Paddings.medium),
             ) {
-                Text(text = "Back")
-            }
+                items(myWorksUiState.myWorks, key = { it.id }) {
 
-            Button(
-                onClick = { navigateToDrawingResult(0, 0) }
-            ) {
-                Text(text = "작업물 선택")
+                    var deleteDialog by remember { mutableStateOf(false) }
+
+                    MyWorkImage(
+                        sketchType = it.sketchType,
+                        paths = it.paths.toPersistentList(),
+                        onClick = { navigateToDrawingResult(it.sketchType, it.id) },
+                        onDeleteClick = { deleteDialog = true },
+                    )
+
+                    if (deleteDialog) {
+                        FillSketchDialog(
+                            onDismissRequest = { deleteDialog = false }
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                OutlinedText(
+                                    modifier = Modifier.padding(horizontal = Paddings.medium),
+                                    textModifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = Paddings.xextra),
+                                    text = "Once deleted, it can't be undone.\nIs it okay to delete?",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = MaterialTheme.colorScheme.tertiary,
+                                        lineHeight = 20.sp
+                                    ),
+                                    outlineColor = MaterialTheme.colorScheme.onTertiary,
+                                    outlineDrawStyle = Stroke(
+                                        width = 10f,
+                                    ),
+                                    textAlign = TextAlign.Center
+                                )
+
+                                FillSketchSettingButton(
+                                    modifier = Modifier
+                                        .padding(top = Paddings.xextra)
+                                        .height(60.dp)
+                                        .width(200.dp),
+                                    painter = painterResource(id = DesignSystemR.drawable.ic_trash),
+                                    text = "delete",
+                                    onClick = {
+                                        deleteMyWork(it.id)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-
 }
 
-@Preview
+@SuppressLint("UnrememberedMutableState")
+@Preview(device = "id:pixel_4")
+@Preview(device = "id:pixel_c")
 @Composable
-fun MyWorksScreenPreview() {
+fun MyWorksContentPreview() {
     FillSketchTheme {
-        MyWorksScreen(
-            paddingValues = PaddingValues(),
-            onShowErrorSnackBar = {},
+        MyWorksContent(
+            myWorksUiState = MyWorksUiState(
+                myWorks = persistentListOf(
+                    MyWork(
+                        id = 0,
+                        sketchType = 0,
+                        paths = mutableStateListOf(
+                            PathWrapper(
+                                points = mutableStateListOf(
+                                    Offset(0f, 0f),
+                                    Offset(0f, 0f),
+                                    Offset(1000f, 1000f),
+                                ),
+                                strokeWidth = 40f,
+                                strokeColor = Color.Red,
+                                actionType = ActionType.BRUSH,
+                                alpha = 1f
+                            )
+                        )
+                    ),
+                    MyWork(
+                        id = 1,
+                        sketchType = 9,
+                        paths = mutableStateListOf()
+                    )
+                )
+            ),
             onBackClick = {},
-            navigateToDrawingResult = { _, _ -> }
+            navigateToDrawingResult = { _, _ -> },
+            deleteMyWork = {}
         )
     }
 }

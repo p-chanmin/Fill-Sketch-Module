@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ fun DrawingResultScreen(
     sketchType: Int,
     drawingResultId: Int,
     onShowErrorSnackBar: (message: String) -> Unit,
+    onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
     navigateToMyWorks: () -> Unit,
     drawingResultViewModel: DrawingResultViewModel = hiltViewModel()
@@ -82,6 +85,7 @@ fun DrawingResultScreen(
         navigateToDrawing = { navigateToDrawing(sketchType, drawingResultId) },
         dismissSaveCompleteDialog = { drawingResultViewModel.updateSaveCompleteDialogVisible(false) },
         navigateToMyWorks = navigateToMyWorks,
+        onBackClick = onBackClick,
         saveDrawingResult = {
             coroutineScope.launch {
                 val resultBitmap =
@@ -130,61 +134,74 @@ fun DrawingResultContent(
     drawingResultUiState: DrawingResultUiState,
     navigateToDrawing: () -> Unit,
     dismissSaveCompleteDialog: () -> Unit,
+    onBackClick: () -> Unit,
     saveDrawingResult: () -> Unit,
     navigateToMyWorks: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(Paddings.xlarge),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-
-        OutlinedText(
-            textModifier = Modifier,
-            text = "Download Your Drawing !",
-            style = MaterialTheme.typography.titleLarge.copy(
-                color = MaterialTheme.colorScheme.tertiary,
-            ),
-            outlineColor = MaterialTheme.colorScheme.onTertiary,
-            outlineDrawStyle = Stroke(
-                width = 15f
-            ),
-            textAlign = TextAlign.Center
-        )
-
-        DrawingResultImage(
+        Column(
             modifier = Modifier
-                .width(400.dp)
-                .padding(Paddings.xextra),
-            sketchType = sketchType,
-            paths = drawingResultUiState.paths
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(Paddings.xlarge),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            FillSketchSettingButton(
-                modifier = Modifier
-                    .height(60.dp)
-                    .width(60.dp),
-                painter = painterResource(id = DesignSystemR.drawable.ic_edit),
-                onClick = { navigateToDrawing() }
+            OutlinedText(
+                textModifier = Modifier,
+                text = "Download Your Drawing !",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.tertiary,
+                ),
+                outlineColor = MaterialTheme.colorScheme.onTertiary,
+                outlineDrawStyle = Stroke(
+                    width = 15f
+                ),
+                textAlign = TextAlign.Center
             )
-            FillSketchSettingButton(
+
+            DrawingResultImage(
                 modifier = Modifier
-                    .padding(start = 32.dp)
-                    .height(60.dp)
-                    .width(200.dp),
-                painter = painterResource(id = DesignSystemR.drawable.ic_download),
-                onClick = { saveDrawingResult() }
+                    .width(400.dp)
+                    .padding(Paddings.xextra),
+                sketchType = sketchType,
+                paths = drawingResultUiState.paths
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                FillSketchSettingButton(
+                    modifier = Modifier
+                        .height(60.dp)
+                        .width(60.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_edit),
+                    onClick = { navigateToDrawing() }
+                )
+                FillSketchSettingButton(
+                    modifier = Modifier
+                        .padding(start = 32.dp)
+                        .height(60.dp)
+                        .width(200.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_download),
+                    onClick = { saveDrawingResult() }
+                )
+            }
         }
+
+        FillSketchSettingButton(
+            modifier = Modifier
+                .padding(top = Paddings.xlarge, start = Paddings.large)
+                .size(60.dp),
+            painter = painterResource(id = DesignSystemR.drawable.ic_left),
+            onClick = { onBackClick() }
+        )
     }
+
     if (drawingResultUiState.saveCompleteDialogVisible) {
         FillSketchDialog(
             onDismissRequest = { dismissSaveCompleteDialog() }
@@ -218,7 +235,6 @@ fun DrawingResultContent(
                     }
                 )
             }
-
         }
     }
 }
@@ -232,7 +248,7 @@ fun DrawingResultContentPreview() {
         DrawingResultContent(
             sketchType = 0,
             drawingResultUiState = DrawingResultUiState(
-                saveCompleteDialogVisible = true,
+                saveCompleteDialogVisible = false,
                 paths = persistentListOf(
                     PathWrapper(
                         points = mutableStateListOf(
@@ -249,6 +265,7 @@ fun DrawingResultContentPreview() {
             ),
             navigateToDrawing = {},
             dismissSaveCompleteDialog = {},
+            onBackClick = {},
             saveDrawingResult = {},
             navigateToMyWorks = {}
         )

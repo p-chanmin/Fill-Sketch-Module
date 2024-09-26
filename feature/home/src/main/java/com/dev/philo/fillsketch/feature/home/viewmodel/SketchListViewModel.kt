@@ -46,7 +46,7 @@ class SketchListViewModel @Inject constructor(
     }
 
     private suspend fun getMyWorksBySketchType(sketchType: Int): PersistentList<MyWork> {
-        return sketchRepository.getMyWorkBySketchType(sketchType).first()
+        return sketchRepository.getDrawingResultBySketchType(sketchType).first()
             .map { drawingResult ->
                 MyWork.create(drawingResult)
             }.toPersistentList()
@@ -97,7 +97,7 @@ class SketchListViewModel @Inject constructor(
             _uiEventFlow.emit(
                 SketchListUiEvent.NavigateToDrawing(
                     sketchType,
-                    sketchRepository.addMyWork(sketchType)
+                    sketchRepository.addDrawingResult(sketchType)
                 )
             )
             _sketchListUiState.update {
@@ -113,7 +113,7 @@ class SketchListViewModel @Inject constructor(
 
     fun deleteMyWork(sketchType: Int, drawingResultId: Int) {
         viewModelScope.launch {
-            sketchRepository.deleteMyWork(drawingResultId)
+            sketchRepository.deleteDrawingResult(drawingResultId)
             _sketchListUiState.update {
                 it.copy(
                     myWorks = getMyWorksBySketchType(sketchType),

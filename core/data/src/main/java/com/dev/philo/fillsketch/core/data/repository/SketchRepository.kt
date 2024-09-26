@@ -31,25 +31,38 @@ class SketchRepository @Inject constructor(
             }
         }
 
-    fun getMyWorkBySketchType(sketchType: Int): Flow<List<DrawingResult>> =
+    fun getDrawingResult(): Flow<List<DrawingResult>> =
         fillSketchDataSource.drawingResultList
-            .map { myWorkSchemaList ->
-                myWorkSchemaList.filter { it.sketchType == sketchType }.map {
-                    val pathWrapperList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
+            .map { drawingResultList ->
+                drawingResultList.map {
+                    val pathDataList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
                     DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
-                        paths = pathWrapperList
+                        paths = pathDataList
                     )
                 }
             }
 
-    suspend fun addMyWork(sketchType: Int): Int {
-        return fillSketchDataSource.addMyWork(sketchType)
+    fun getDrawingResultBySketchType(sketchType: Int): Flow<List<DrawingResult>> =
+        fillSketchDataSource.drawingResultList
+            .map { myWorkSchemaList ->
+                myWorkSchemaList.filter { it.sketchType == sketchType }.map {
+                    val pathDataList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
+                    DrawingResult(
+                        id = it._id,
+                        sketchType = it.sketchType,
+                        paths = pathDataList
+                    )
+                }
+            }
+
+    suspend fun addDrawingResult(sketchType: Int): Int {
+        return fillSketchDataSource.addDrawingResult(sketchType)
     }
 
-    suspend fun deleteMyWork(myWorkId: Int) {
-        fillSketchDataSource.deleteDrawingResult(myWorkId)
+    suspend fun deleteDrawingResult(drawingResultId: Int) {
+        fillSketchDataSource.deleteDrawingResult(drawingResultId)
     }
 
     suspend fun updateLockState(sketchType: Int, isLocked: Boolean = false) {

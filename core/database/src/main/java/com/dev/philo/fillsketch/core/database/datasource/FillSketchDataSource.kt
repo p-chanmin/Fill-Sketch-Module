@@ -31,7 +31,7 @@ class FillSketchDataSource @Inject constructor(
     fun getDrawingResultById(myWorkId: Int) =
         realm.query<DrawingResultSchema>("_id == $0", myWorkId).asFlow().map { it.list.first() }
 
-    suspend fun addMyWork(sketchType: Int): Int {
+    suspend fun addDrawingResult(sketchType: Int): Int {
 
         val id = getNextDrawingResultPrimaryKey()
 

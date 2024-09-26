@@ -1,6 +1,5 @@
 package com.dev.philo.fillsketch.feature.home.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,16 +17,22 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -186,6 +191,9 @@ fun SketchListContent(
                     }
 
                     items(sketchListUiState.myWorks, key = { it.id }) {
+
+                        var deleteDialog by remember { mutableStateOf(false) }
+
                         MyWorkImage(
                             sketchType = it.sketchType,
                             paths = it.paths.toPersistentList(),
@@ -193,8 +201,48 @@ fun SketchListContent(
                                 selectSketch(sketchListUiState.selectedSketchId)
                                 navigateToDrawing(it.sketchType, it.id)
                             },
-                            onDeleteClick = { deleteMyWork(it.sketchType, it.id) }
+                            onDeleteClick = { deleteDialog = true }
                         )
+
+                        if (deleteDialog) {
+                            FillSketchDialog(
+                                onDismissRequest = { deleteDialog = false }
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    OutlinedText(
+                                        modifier = Modifier.padding(horizontal = Paddings.medium),
+                                        textModifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = Paddings.xextra),
+                                        text = "Once deleted, it can't be undone.\nIs it okay to delete?",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = MaterialTheme.colorScheme.tertiary,
+                                            lineHeight = 20.sp
+                                        ),
+                                        outlineColor = MaterialTheme.colorScheme.onTertiary,
+                                        outlineDrawStyle = Stroke(
+                                            width = 10f,
+                                        ),
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    FillSketchSettingButton(
+                                        modifier = Modifier
+                                            .padding(top = Paddings.xextra)
+                                            .height(60.dp)
+                                            .width(200.dp),
+                                        painter = painterResource(id = DesignSystemR.drawable.ic_trash),
+                                        text = "delete",
+                                        onClick = {
+                                            deleteMyWork(it.sketchType, it.id)
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -204,29 +252,18 @@ fun SketchListContent(
             FillSketchDialog(
                 onDismissRequest = { selectSketch(sketchListUiState.selectedSketchId) }
             ) {
+                val scrollState = rememberScrollState()
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Paddings.medium),
-                        horizontalArrangement = Arrangement.Absolute.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .width(140.dp)
-                                .padding(30.dp),
-                            painter = painterResource(id = DesignSystemR.drawable.ic_ads),
-                            contentDescription = null
-                        )
-                        FillSketchCard(
-                            modifier = Modifier.width(140.dp),
-                            painter = painterResource(id = SketchResource.sketchOutlineResourceIds[sketchListUiState.selectedSketchId]),
-                            onClick = {}
-                        )
-                    }
+                    FillSketchCard(
+                        modifier = Modifier.width(200.dp),
+                        painter = painterResource(id = SketchResource.sketchOutlineResourceIds[sketchListUiState.selectedSketchId]),
+                        onClick = {}
+                    )
                     FillSketchSettingButton(
                         modifier = Modifier
                             .padding(top = Paddings.large)
@@ -275,7 +312,7 @@ fun SketchListContentPreview() {
                     MyWork(1, 0),
                     MyWork(2, 0),
                 ),
-                dialogUnlockVisible = false,
+                dialogUnlockVisible = true,
                 dialogMyWorksVisible = false
             ),
             selectSketch = {},

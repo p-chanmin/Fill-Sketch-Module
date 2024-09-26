@@ -27,9 +27,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dev.philo.fillsketch.core.designsystem.R
-import com.dev.philo.fillsketch.asset.R as AssetR
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.asset.R as AssetR
 
 @Composable
 fun FillSketchMainButton(
@@ -130,7 +130,7 @@ fun FillSketchSettingButton(
 
             text?.let {
                 OutlinedText(
-                    modifier = Modifier
+                    textModifier = Modifier
                         .padding(start = Paddings.large),
                     text = text,
                     style = MaterialTheme.typography.bodySmall.copy(
@@ -202,7 +202,9 @@ private fun FillSketchSettingButtonPreview() {
 private fun FillSketchSettingButton1Preview() {
     FillSketchTheme {
         FillSketchSettingButton(
-            modifier = Modifier.height(60.dp).width(200.dp),
+            modifier = Modifier
+                .height(60.dp)
+                .width(200.dp),
             painter = painterResource(id = R.drawable.ic_setting),
             onClick = {}
         )
@@ -214,7 +216,9 @@ private fun FillSketchSettingButton1Preview() {
 private fun FillSketchSettingButton2Preview() {
     FillSketchTheme {
         FillSketchSettingButton(
-            modifier = Modifier.height(60.dp).fillMaxWidth(),
+            modifier = Modifier
+                .height(60.dp)
+                .fillMaxWidth(),
             painter = painterResource(id = R.drawable.ic_ads),
             text = "Unlock by watching an ADs",
             onClick = {}

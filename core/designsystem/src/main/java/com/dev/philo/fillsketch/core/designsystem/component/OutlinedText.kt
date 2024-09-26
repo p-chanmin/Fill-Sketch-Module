@@ -21,6 +21,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 fun OutlinedText(
     text: String,
     modifier: Modifier = Modifier,
+    textModifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     outlineColor: Color,
     outlineDrawStyle: Stroke = Stroke(),
@@ -31,8 +32,11 @@ fun OutlinedText(
     minLines: Int = 1,
     onTextLayout: (TextLayoutResult) -> Unit = {},
 ) {
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+    ) {
         Text(
+            modifier = textModifier,
             text = text,
             color = outlineColor,
             textDecoration = null,
@@ -48,6 +52,7 @@ fun OutlinedText(
         )
 
         Text(
+            modifier = textModifier,
             text = text,
             textAlign = textAlign,
             lineHeight = lineHeight,

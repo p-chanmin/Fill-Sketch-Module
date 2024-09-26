@@ -40,6 +40,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingBut
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.feature.home.model.HomeUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.HomeViewModel
 import kotlin.math.roundToInt
 import com.dev.philo.fillsketch.asset.R as AssetR
@@ -56,6 +57,23 @@ fun HomeScreen(
 
     val homeUiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
 
+    HomeContent(
+        homeUiState = homeUiState,
+        navigateToSketchList = navigateToSketchList,
+        navigateToMyWorks = navigateToMyWorks,
+        updateSoundEffectSetting = homeViewModel::updateSoundEffectSetting,
+        updateBackgroundMusicSetting = homeViewModel::updateBackgroundMusicSetting,
+    )
+}
+
+@Composable
+fun HomeContent(
+    homeUiState: HomeUiState,
+    navigateToSketchList: () -> Unit,
+    navigateToMyWorks: () -> Unit,
+    updateSoundEffectSetting: () -> Unit,
+    updateBackgroundMusicSetting: () -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -83,7 +101,7 @@ fun HomeScreen(
                 } else {
                     painterResource(id = DesignSystemR.drawable.ic_se_off)
                 },
-                onClick = { homeViewModel.updateSoundEffectSetting() }
+                onClick = { updateSoundEffectSetting() }
             )
 
             FillSketchSettingButton(
@@ -93,7 +111,7 @@ fun HomeScreen(
                 } else {
                     painterResource(id = DesignSystemR.drawable.ic_bgm_off)
                 },
-                onClick = { homeViewModel.updateBackgroundMusicSetting() }
+                onClick = { updateBackgroundMusicSetting() }
             )
 
             FillSketchSettingButton(
@@ -227,13 +245,14 @@ fun HomeScreen(
 @Preview(device = "id:pixel_4")
 @Preview(device = "id:pixel_c")
 @Composable
-fun HomeScreenPhonePreview() {
+fun HomeContentPreview() {
     FillSketchTheme {
-        HomeScreen(
-            paddingValues = PaddingValues(),
-            onShowErrorSnackBar = {},
+        HomeContent(
+            homeUiState = HomeUiState(),
             navigateToSketchList = {},
-            navigateToMyWorks = {}
+            navigateToMyWorks = {},
+            updateSoundEffectSetting = {},
+            updateBackgroundMusicSetting = {},
         )
     }
 }

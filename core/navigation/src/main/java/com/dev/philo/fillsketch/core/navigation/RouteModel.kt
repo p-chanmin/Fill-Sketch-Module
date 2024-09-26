@@ -13,8 +13,8 @@ sealed interface Route {
     data object MyWorks : Route
 
     @Serializable
-    data object Drawing : Route
+    data class Drawing(val sketchType: Int, val drawingResultId: Int) : Route
 
     @Serializable
-    data object DrawingResult : Route
+    data class DrawingResult(val sketchType: Int, val drawingResultId: Int) : Route
 }

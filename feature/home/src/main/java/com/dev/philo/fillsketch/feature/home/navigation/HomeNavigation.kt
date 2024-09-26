@@ -25,8 +25,8 @@ fun NavGraphBuilder.homeNavGraph(
     onBackClick: () -> Unit,
     navigateToSketchList: () -> Unit,
     navigateToMyWorks: () -> Unit,
-    navigateToDrawing: () -> Unit,
-    navigateToDrawingResult: () -> Unit
+    navigateToDrawing: (Int, Int) -> Unit,
+    navigateToDrawingResult: (Int, Int) -> Unit
 ) {
     composable<Route.Home>(
         enterTransition = { fadeIn() },

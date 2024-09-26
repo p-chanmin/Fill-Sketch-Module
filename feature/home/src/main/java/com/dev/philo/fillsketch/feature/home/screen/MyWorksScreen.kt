@@ -17,7 +17,7 @@ fun MyWorksScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawingResult: () -> Unit
+    navigateToDrawingResult: (Int, Int) -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -36,7 +36,7 @@ fun MyWorksScreen(
             }
 
             Button(
-                onClick = { navigateToDrawingResult() }
+                onClick = { navigateToDrawingResult(0, 0) }
             ) {
                 Text(text = "작업물 선택")
             }
@@ -53,7 +53,7 @@ fun MyWorksScreenPreview() {
             paddingValues = PaddingValues(),
             onShowErrorSnackBar = {},
             onBackClick = {},
-            navigateToDrawingResult = {}
+            navigateToDrawingResult = { _, _ -> }
         )
     }
 }

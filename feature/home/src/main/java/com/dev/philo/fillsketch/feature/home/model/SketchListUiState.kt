@@ -1,8 +1,7 @@
 package com.dev.philo.fillsketch.feature.home.model
 
 import androidx.compose.runtime.Immutable
-import com.dev.philo.fillsketch.core.data.model.MyWork
-import com.dev.philo.fillsketch.core.data.model.Sketch
+import com.dev.philo.fillsketch.core.model.Sketch
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

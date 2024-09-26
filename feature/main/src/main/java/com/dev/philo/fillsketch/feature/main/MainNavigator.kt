@@ -6,8 +6,8 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.dev.philo.fillsketch.core.navigation.Route
-import com.dev.philo.fillsketch.feature.home.navigation.navigateToDrawing
-import com.dev.philo.fillsketch.feature.home.navigation.navigateToDrawingResult
+import com.dev.philo.fillsketch.feature.drawing.navigation.navigateToDrawing
+import com.dev.philo.fillsketch.feature.drawing.navigation.navigateToDrawingResult
 import com.dev.philo.fillsketch.feature.home.navigation.navigateToMyWorks
 import com.dev.philo.fillsketch.feature.home.navigation.navigateToSketchList
 
@@ -25,14 +25,14 @@ internal class MainNavigator(
         navController.navigateToMyWorks()
     }
 
-    fun navigateToDrawing() {
+    fun navigateToDrawing(sketchType: Int, drawingResultId: Int) {
         navController.popBackStack<Route.Drawing>(inclusive = true)
         navController.popBackStack<Route.DrawingResult>(inclusive = true)
-        navController.navigateToDrawing()
+        navController.navigateToDrawing(sketchType, drawingResultId)
     }
 
-    fun navigateToDrawingResult() {
-        navController.navigateToDrawingResult()
+    fun navigateToDrawingResult(sketchType: Int, drawingResultId: Int) {
+        navController.navigateToDrawingResult(sketchType, drawingResultId)
     }
 
     private fun popBackStack() {

@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.asset.SketchResource
-import com.dev.philo.fillsketch.core.data.model.MyWork
-import com.dev.philo.fillsketch.core.data.model.Sketch
 import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchCard
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
@@ -42,11 +41,15 @@ import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingBut
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.Sketch
 import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
+import com.dev.philo.fillsketch.feature.home.model.MyWork
+import com.dev.philo.fillsketch.feature.home.model.SketchListUiEvent
 import com.dev.philo.fillsketch.feature.home.model.SketchListUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.SketchListViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.flow.collectLatest
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
 @Composable
@@ -54,11 +57,21 @@ fun SketchListScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: () -> Unit,
+    navigateToDrawing: (Int, Int) -> Unit,
     sketchListViewModel: SketchListViewModel = hiltViewModel()
 ) {
 
     val sketchListUiState by sketchListViewModel.sketchListUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        sketchListViewModel.uiEventFlow.collectLatest { event ->
+            when (event) {
+                is SketchListUiEvent.NavigateToDrawing -> {
+                    navigateToDrawing(event.sketchType, event.drawingResultId)
+                }
+            }
+        }
+    }
 
     SketchListContent(
         onShowErrorSnackBar = onShowErrorSnackBar,
@@ -66,7 +79,9 @@ fun SketchListScreen(
         navigateToDrawing = navigateToDrawing,
         sketchListUiState = sketchListUiState,
         selectSketch = sketchListViewModel::selectSketch,
-        unlockSketch = sketchListViewModel::unlockSketch
+        unlockSketch = sketchListViewModel::unlockSketch,
+        addMyWork = sketchListViewModel::addMyWork,
+        deleteMyWork = sketchListViewModel::deleteMyWork
     )
 
 }
@@ -75,10 +90,12 @@ fun SketchListScreen(
 fun SketchListContent(
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: () -> Unit,
+    navigateToDrawing: (Int, Int) -> Unit,
     sketchListUiState: SketchListUiState = SketchListUiState(),
     selectSketch: (Int) -> Unit,
-    unlockSketch: (Int) -> Unit
+    unlockSketch: (Int) -> Unit,
+    addMyWork: (Int) -> Unit,
+    deleteMyWork: (Int, Int) -> Unit,
 ) {
 
     val lazyGridState = rememberLazyGridState()
@@ -103,7 +120,7 @@ fun SketchListContent(
             )
 
             OutlinedText(
-                modifier = Modifier,
+                textModifier = Modifier,
                 text = "Select Sketch !",
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 35.sp,
@@ -137,7 +154,6 @@ fun SketchListContent(
                         painter = painterResource(id = SketchResource.sketchOutlineResourceIds[it.sketchType]),
                         isLock = it.isLocked
                     ) {
-                        println("다이얼로그 ${it.sketchType}")
                         selectSketch(it.sketchType)
                     }
 
@@ -164,7 +180,7 @@ fun SketchListContent(
                             painter = painterResource(id = R.drawable.ic_plus),
                             color = MaterialTheme.colorScheme.onPrimary,
                             onClick = {
-
+                                addMyWork(sketchListUiState.selectedSketchId)
                             }
                         )
                     }
@@ -173,7 +189,11 @@ fun SketchListContent(
                         MyWorkImage(
                             sketchType = it.sketchType,
                             paths = it.paths.toPersistentList(),
-                            onClick = {}
+                            onClick = {
+                                selectSketch(sketchListUiState.selectedSketchId)
+                                navigateToDrawing(it.sketchType, it.id)
+                            },
+                            onDeleteClick = { deleteMyWork(it.sketchType, it.id) }
                         )
                     }
                 }
@@ -235,7 +255,7 @@ fun SketchListContentPreview() {
         SketchListContent(
             onShowErrorSnackBar = {},
             onBackClick = {},
-            navigateToDrawing = {},
+            navigateToDrawing = { _, _ -> },
             sketchListUiState = SketchListUiState(
                 sketchList = persistentListOf(
                     Sketch(sketchType = 0, isLocked = false),
@@ -256,10 +276,12 @@ fun SketchListContentPreview() {
                     MyWork(2, 0),
                 ),
                 dialogUnlockVisible = false,
-                dialogMyWorksVisible = true
+                dialogMyWorksVisible = false
             ),
             selectSketch = {},
-            unlockSketch = {}
+            unlockSketch = {},
+            addMyWork = {},
+            deleteMyWork = { _, _ -> }
         )
     }
 }

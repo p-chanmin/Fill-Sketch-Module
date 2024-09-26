@@ -3,8 +3,11 @@ package com.dev.philo.fillsketch.feature.home.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.philo.fillsketch.core.data.repository.SketchRepository
+import com.dev.philo.fillsketch.feature.home.model.MyWork
+import com.dev.philo.fillsketch.feature.home.model.SketchListUiEvent
 import com.dev.philo.fillsketch.feature.home.model.SketchListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -29,6 +32,9 @@ class SketchListViewModel @Inject constructor(
     private val _sketchListUiState = MutableStateFlow(SketchListUiState())
     val sketchListUiState = _sketchListUiState.asStateFlow()
 
+    private val _uiEventFlow = MutableSharedFlow<SketchListUiEvent>()
+    val uiEventFlow get() = _uiEventFlow.asSharedFlow()
+
     init {
         sketchRepository.getSketch().onEach { sketchList ->
             _sketchListUiState.update {
@@ -39,24 +45,40 @@ class SketchListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    private suspend fun getMyWorksBySketchType(sketchType: Int): PersistentList<MyWork> {
+        return sketchRepository.getMyWorkBySketchType(sketchType).first()
+            .map { drawingResult ->
+                MyWork.create(drawingResult)
+            }.toPersistentList()
+    }
+
     fun selectSketch(sketchType: Int) {
         viewModelScope.launch {
             if (_sketchListUiState.value.selectedSketchId == null) {
-                _sketchListUiState.update {
-                    if (_sketchListUiState.value.sketchList[sketchType].isLocked) {
+
+                if (_sketchListUiState.value.sketchList[sketchType].isLocked) {
+                    _sketchListUiState.update {
                         it.copy(
                             selectedSketchId = sketchType,
                             dialogUnlockVisible = true
                         )
+                    }
+                } else {
+                    val myWorks = getMyWorksBySketchType(sketchType)
+
+                    if (myWorks.isEmpty()) {
+                        addMyWork(sketchType)
                     } else {
-                        it.copy(
-                            selectedSketchId = sketchType,
-                            myWorks = sketchRepository.getMyWorkBySketchType(sketchType).first()
-                                .toPersistentList(),
-                            dialogMyWorksVisible = true
-                        )
+                        _sketchListUiState.update {
+                            it.copy(
+                                selectedSketchId = sketchType,
+                                myWorks = myWorks,
+                                dialogMyWorksVisible = true
+                            )
+                        }
                     }
                 }
+
             } else {
                 _sketchListUiState.update {
                     it.copy(
@@ -66,6 +88,36 @@ class SketchListViewModel @Inject constructor(
                         dialogUnlockVisible = false
                     )
                 }
+            }
+        }
+    }
+
+    fun addMyWork(sketchType: Int) {
+        viewModelScope.launch {
+            _uiEventFlow.emit(
+                SketchListUiEvent.NavigateToDrawing(
+                    sketchType,
+                    sketchRepository.addMyWork(sketchType)
+                )
+            )
+            _sketchListUiState.update {
+                it.copy(
+                    selectedSketchId = null,
+                    myWorks = persistentListOf(),
+                    dialogMyWorksVisible = false,
+                    dialogUnlockVisible = false
+                )
+            }
+        }
+    }
+
+    fun deleteMyWork(sketchType: Int, drawingResultId: Int) {
+        viewModelScope.launch {
+            sketchRepository.deleteMyWork(drawingResultId)
+            _sketchListUiState.update {
+                it.copy(
+                    myWorks = getMyWorksBySketchType(sketchType),
+                )
             }
         }
     }

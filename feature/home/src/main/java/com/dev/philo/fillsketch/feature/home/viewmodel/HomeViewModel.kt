@@ -2,12 +2,9 @@ package com.dev.philo.fillsketch.feature.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.data.repository.SettingRepository
 import com.dev.philo.fillsketch.feature.home.model.HomeUiState
-import com.dev.philo.fillsketch.feature.home.model.SketchListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -21,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val settingRepository: SettingRepository
-): ViewModel() {
+) : ViewModel() {
 
     private val _messageFlow = MutableSharedFlow<String>()
     val messageFlow get() = _messageFlow.asSharedFlow()

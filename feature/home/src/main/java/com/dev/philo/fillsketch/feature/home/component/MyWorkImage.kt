@@ -1,12 +1,12 @@
 package com.dev.philo.fillsketch.feature.home.component
 
+import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.Style
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,28 +16,27 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dev.philo.fillsketch.asset.SketchResource
-import com.dev.philo.fillsketch.core.data.model.ActionType
-import com.dev.philo.fillsketch.core.data.model.ColorSet
-import com.dev.philo.fillsketch.core.data.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
+import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.designsystem.utils.createPath
 import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
+import com.dev.philo.fillsketch.core.model.ActionType
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -46,7 +45,8 @@ fun MyWorkImage(
     modifier: Modifier = Modifier,
     sketchType: Int,
     paths: ImmutableList<PathWrapper>,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
 
     val recommendImageBitmap =
@@ -76,9 +76,9 @@ fun MyWorkImage(
             } else {
                 android.graphics.Color.argb(
                     (path.alpha * 255).toInt(),
-                    path.strokeColor.r,
-                    path.strokeColor.g,
-                    path.strokeColor.b
+                    (path.strokeColor.red * 255).toInt(),
+                    (path.strokeColor.green * 255).toInt(),
+                    (path.strokeColor.blue * 255).toInt()
                 )
             }
             strokeWidth = path.strokeWidth
@@ -127,12 +127,13 @@ fun MyWorkImage(
                     .size(40.dp),
                 painter = painterResource(id = R.drawable.ic_trash),
                 color = MaterialTheme.colorScheme.primary,
-                onClick = { }
+                onClick = { onDeleteClick() }
             )
         }
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 @Preview
 fun MyWorkImagePreview() {
@@ -141,18 +142,19 @@ fun MyWorkImagePreview() {
             sketchType = 0,
             paths = persistentListOf(
                 PathWrapper(
-                    points = listOf(
-                        com.dev.philo.fillsketch.core.data.model.Offset(0f, 0f),
-                        com.dev.philo.fillsketch.core.data.model.Offset(0f, 0f),
-                        com.dev.philo.fillsketch.core.data.model.Offset(500f, 500f),
+                    points = mutableStateListOf(
+                        Offset(0f, 0f),
+                        Offset(0f, 0f),
+                        Offset(1000f, 1000f),
                     ),
-                    strokeWidth = 10f,
-                    strokeColor = ColorSet(255, 0, 0),
+                    strokeWidth = 40f,
+                    strokeColor = Color.Red,
                     actionType = ActionType.BRUSH,
                     alpha = 1f
                 )
             ),
-            onClick = {}
+            onClick = {},
+            onDeleteClick = {}
         )
     }
 }

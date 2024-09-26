@@ -134,7 +134,7 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 OutlinedText(
-                    modifier = Modifier
+                    textModifier = Modifier
                         .padding(bottom = Paddings.xsmall),
                     text = stringResource(id = AssetR.string.title),
                     style = MaterialTheme.typography.titleMedium.copy(
@@ -148,7 +148,7 @@ fun HomeScreen(
                 )
 
                 OutlinedText(
-                    modifier = Modifier
+                    textModifier = Modifier
                         .padding(bottom = Paddings.xsmall),
                     text = stringResource(id = AssetR.string.version_title),
                     style = MaterialTheme.typography.titleMedium.copy(

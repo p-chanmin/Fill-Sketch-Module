@@ -1,12 +1,12 @@
 package com.dev.philo.fillsketch.core.database.datasource
 
-import com.dev.philo.fillsketch.core.database.schema.MyWorkSchema
+import com.dev.philo.fillsketch.core.database.schema.DrawingResultSchema
 import com.dev.philo.fillsketch.core.database.schema.SettingSchema
 import com.dev.philo.fillsketch.core.database.schema.SketchSchema
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.max
 import kotlinx.coroutines.flow.map
-import java.nio.file.Files.find
 import javax.inject.Inject
 
 class FillSketchDataSource @Inject constructor(
@@ -23,21 +23,21 @@ class FillSketchDataSource @Inject constructor(
         .asFlow()
         .map { it.list.toList() }
 
-    val myWorksList = realm
-        .query<MyWorkSchema>()
+    val drawingResultList = realm
+        .query<DrawingResultSchema>()
         .asFlow()
         .map { it.list.toList() }
 
-    fun getMyWorkById(myWorkId: Int) =
-        realm.query<MyWorkSchema>("_id == $0", myWorkId).asFlow().map { it.list.first() }
+    fun getDrawingResultById(myWorkId: Int) =
+        realm.query<DrawingResultSchema>("_id == $0", myWorkId).asFlow().map { it.list.first() }
 
     suspend fun addMyWork(sketchType: Int): Int {
 
-        val id = getNextMyWorksPrimaryKey()
+        val id = getNextDrawingResultPrimaryKey()
 
         realm.write {
             copyToRealm(
-                MyWorkSchema().apply {
+                DrawingResultSchema().apply {
                     this._id = id
                     this.sketchType = sketchType
                 }
@@ -75,24 +75,25 @@ class FillSketchDataSource @Inject constructor(
         }
     }
 
-    suspend fun updateMyWork(
-        myWorkId: Int,
+    suspend fun updateDrawingResult(
+        drawingResultId: Int,
         pathsJsonData: String
     ) {
         realm.write {
-            val myWork = query<MyWorkSchema>("_id == $0", myWorkId).find().first()
-            myWork.pathsJsonData = pathsJsonData
+            val drawingResult = query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
+            drawingResult.pathsJsonData = pathsJsonData
         }
     }
 
-    suspend fun deleteMyWork(myWorkId: Int) {
+    suspend fun deleteDrawingResult(drawingResultId: Int) {
         realm.write {
-            val myWork = query<MyWorkSchema>("_id == $0", myWorkId).find().first()
-            delete(myWork)
+            val drawingResult = query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
+            delete(drawingResult)
         }
     }
 
-    private fun getNextMyWorksPrimaryKey(): Int {
-        return realm.query<MyWorkSchema>().find().size + 1
+    private fun getNextDrawingResultPrimaryKey(): Int {
+        val maxId = realm.query<DrawingResultSchema>().max<Int>("_id").find() ?: 0
+        return maxId + 1
     }
 }

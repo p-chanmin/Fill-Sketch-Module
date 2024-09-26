@@ -1,10 +1,10 @@
 package com.dev.philo.fillsketch.core.data.repository
 
-import com.dev.philo.fillsketch.core.data.converter.PathWrapperAdapter
-import com.dev.philo.fillsketch.core.data.model.MyWork
-import com.dev.philo.fillsketch.core.data.model.PathWrapper
-import com.dev.philo.fillsketch.core.data.model.Sketch
+import com.dev.philo.fillsketch.core.data.converter.PathDataAdapter
 import com.dev.philo.fillsketch.core.database.datasource.FillSketchDataSource
+import com.dev.philo.fillsketch.core.model.DrawingResult
+import com.dev.philo.fillsketch.core.model.PathData
+import com.dev.philo.fillsketch.core.model.Sketch
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
@@ -16,9 +16,9 @@ class SketchRepository @Inject constructor(
 ) {
 
     private val gson = GsonBuilder()
-        .registerTypeAdapter(PathWrapper::class.java, PathWrapperAdapter())
+        .registerTypeAdapter(PathData::class.java, PathDataAdapter())
         .create()
-    private val type = object : TypeToken<List<PathWrapper>>() {}.type
+    private val type = object : TypeToken<List<PathData>>() {}.type
 
     fun getSketch(): Flow<List<Sketch>> = fillSketchDataSource.sketchList
         .map { sketchSchemaList ->
@@ -31,12 +31,12 @@ class SketchRepository @Inject constructor(
             }
         }
 
-    fun getMyWorkBySketchType(sketchType: Int): Flow<List<MyWork>> =
-        fillSketchDataSource.myWorksList
+    fun getMyWorkBySketchType(sketchType: Int): Flow<List<DrawingResult>> =
+        fillSketchDataSource.drawingResultList
             .map { myWorkSchemaList ->
-                myWorkSchemaList.map {
-                    val pathWrapperList: List<PathWrapper> = gson.fromJson(it.pathsJsonData, type)
-                    MyWork(
+                myWorkSchemaList.filter { it.sketchType == sketchType }.map {
+                    val pathWrapperList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
+                    DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
                         paths = pathWrapperList
@@ -49,7 +49,7 @@ class SketchRepository @Inject constructor(
     }
 
     suspend fun deleteMyWork(myWorkId: Int) {
-        fillSketchDataSource.deleteMyWork(myWorkId)
+        fillSketchDataSource.deleteDrawingResult(myWorkId)
     }
 
     suspend fun updateLockState(sketchType: Int, isLocked: Boolean = false) {

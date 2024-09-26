@@ -1,7 +1,7 @@
 package com.dev.philo.fillsketch.core.data.repository
 
-import com.dev.philo.fillsketch.core.data.model.Setting
 import com.dev.philo.fillsketch.core.database.datasource.FillSketchDataSource
+import com.dev.philo.fillsketch.core.model.Setting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

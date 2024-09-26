@@ -1,6 +1,6 @@
 package com.dev.philo.fillsketch.core.data.di
 
-import com.dev.philo.fillsketch.core.data.repository.MyWorkRepository
+import com.dev.philo.fillsketch.core.data.repository.DrawingResultRepository
 import com.dev.philo.fillsketch.core.data.repository.SettingRepository
 import com.dev.philo.fillsketch.core.data.repository.SketchRepository
 import com.dev.philo.fillsketch.core.database.datasource.FillSketchDataSource
@@ -34,7 +34,7 @@ object DataModule {
     @Singleton
     fun provideMyWorkRepository(
         fillSketchDataSource: FillSketchDataSource
-    ): MyWorkRepository {
-        return MyWorkRepository(fillSketchDataSource)
+    ): DrawingResultRepository {
+        return DrawingResultRepository(fillSketchDataSource)
     }
 }

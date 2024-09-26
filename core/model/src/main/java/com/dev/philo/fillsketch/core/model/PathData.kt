@@ -1,20 +1,20 @@
-package com.dev.philo.fillsketch.core.data.model
+package com.dev.philo.fillsketch.core.model
 
-data class Offset(
+data class Point(
     val x: Float,
     val y: Float
 )
 
-data class ColorSet(
+data class StrokeColor(
     val r: Int,
     val g: Int,
     val b: Int,
 )
 
-data class PathWrapper(
-    var points: List<Offset>,
+data class PathData(
+    val points: List<Point>,
     val strokeWidth: Float = 10f,
-    val strokeColor: ColorSet,
+    val strokeColor: StrokeColor,
     val actionType: ActionType,
     val alpha: Float = 1f
 )

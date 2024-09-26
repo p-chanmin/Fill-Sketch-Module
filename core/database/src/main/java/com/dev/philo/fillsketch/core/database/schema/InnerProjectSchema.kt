@@ -14,7 +14,7 @@ class SketchSchema : RealmObject {
     var isLocked: Boolean = true
 }
 
-class MyWorkSchema : RealmObject {
+class DrawingResultSchema : RealmObject {
     @PrimaryKey
     var _id: Int = 0
     var sketchType: Int = -1

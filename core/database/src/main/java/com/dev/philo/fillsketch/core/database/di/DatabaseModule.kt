@@ -1,7 +1,7 @@
 package com.dev.philo.fillsketch.core.database.di
 
 import com.dev.philo.fillsketch.asset.SketchResource
-import com.dev.philo.fillsketch.core.database.schema.MyWorkSchema
+import com.dev.philo.fillsketch.core.database.schema.DrawingResultSchema
 import com.dev.philo.fillsketch.core.database.schema.SettingSchema
 import com.dev.philo.fillsketch.core.database.schema.SketchSchema
 import dagger.Module
@@ -25,7 +25,7 @@ object DatabaseModule {
                 schema = setOf(
                     SettingSchema::class,
                     SketchSchema::class,
-                    MyWorkSchema::class,
+                    DrawingResultSchema::class,
                 )
             ).name("fillsketch.realm")
             .schemaVersion(1)

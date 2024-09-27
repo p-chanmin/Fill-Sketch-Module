@@ -1,11 +1,17 @@
 package com.dev.philo.fillsketch.feature.drawing.component
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +24,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedIconButton
@@ -35,16 +43,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
 import com.github.skydoves.colorpicker.compose.AlphaSlider
@@ -94,12 +113,12 @@ fun DrawingPalette(
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
     colorPickerController: ColorPickerController,
+    openColorPickerDialog: () -> Unit,
     updateActionType: (ActionType) -> Unit,
     updateStrokeWidth: (Float) -> Unit,
     updateMagicBrushState: () -> Unit,
 ) {
 
-    var colorPaletteDialog by remember { mutableStateOf(false) }
     var currentPreColorIndex by remember { mutableIntStateOf(0) }
 
     Row(
@@ -175,7 +194,7 @@ fun DrawingPalette(
                                     Box(
                                         modifier = Modifier
                                             .size(25.dp)
-                                            .clickable { colorPaletteDialog = true }
+                                            .clickable { openColorPickerDialog() }
                                             .background(Color.White.copy(alpha = 0.3f))
                                     )
                                 }
@@ -409,14 +428,6 @@ fun DrawingPalette(
                 }
             }
         )
-
-        if (colorPaletteDialog) {
-            ColorPickerDialog(
-                onDismiss = { colorPaletteDialog = false },
-                colorPickerController = colorPickerController,
-                initialColor = drawingUiState.strokeColor
-            )
-        }
     }
 }
 
@@ -424,6 +435,8 @@ fun DrawingPalette(
 fun ColorPickerDialog(
     onDismiss: () -> Unit,
     colorPickerController: ColorPickerController,
+    sketchType: Int,
+    currentMaskBitmap: Bitmap,
     initialColor: Color,
 ) {
     FillSketchDialog(
@@ -433,48 +446,206 @@ fun ColorPickerDialog(
         }
     ) {
         val controller = rememberColorPickerController()
+        var dropperMode by remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
             controller.selectByColor(initialColor, false)
         }
 
-        Column(
-            modifier = Modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            HsvColorPicker(
-                modifier = Modifier
-                    .size(250.dp)
-                    .padding(10.dp),
-                controller = controller,
-                initialColor = initialColor,
-                onColorChanged = { colorEnvelope ->
-                    colorPickerController.selectByColor(colorEnvelope.color, true)
+        Box {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier.verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (dropperMode) {
+
+                    val recommendAndroidBitmap =
+                        ImageBitmap.imageResource(SketchResource.sketchRecommendResourceIds[sketchType])
+                            .asAndroidBitmap()
+                    val outlineAndroidBitmap =
+                        ImageBitmap.imageResource(SketchResource.sketchOutlineResourceIds[sketchType])
+                            .asAndroidBitmap()
+                    val resultBitmap = getEmptyBitmapBySize(
+                        currentMaskBitmap.width,
+                        currentMaskBitmap.height,
+                        currentMaskBitmap.density,
+                        whiteBackground = true
+                    )
+                    val resultCanvas = Canvas(resultBitmap)
+                    val paint = Paint()
+
+                    resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
+                    resultCanvas.drawBitmap(currentMaskBitmap, 0f, 0f, paint)
+                    resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
+
+                    val result = remember { mutableStateOf(resultBitmap) }
+
+                    ImageDropper(
+                        modifier = Modifier
+                            .size(350.dp)
+                            .padding(10.dp),
+                        imageBitmap = result.value,
+                        selectColor = { color ->
+                            controller.selectByColor(color, true)
+                            colorPickerController.selectByColor(color, true)
+                        }
+                    )
+                } else {
+                    HsvColorPicker(
+                        modifier = Modifier
+                            .size(250.dp)
+                            .padding(10.dp),
+                        controller = controller,
+                        initialColor = initialColor,
+                        onColorChanged = { colorEnvelope ->
+                            colorPickerController.selectByColor(colorEnvelope.color, true)
+                        }
+                    )
                 }
-            )
-            AlphaSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-            )
+                AlphaSlider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .height(35.dp),
+                    controller = controller,
+                )
 
-            BrightnessSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-            )
+                BrightnessSlider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .height(35.dp),
+                    controller = controller,
+                )
 
-            AlphaTile(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .size(35.dp)
-                    .clip(RoundedCornerShape(6.dp)),
-                controller = controller,
+                AlphaTile(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(35.dp)
+                        .clip(RoundedCornerShape(6.dp)),
+                    controller = controller,
+                )
+            }
+
+            if (dropperMode) {
+                Image(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(35.dp)
+                        .align(Alignment.BottomStart)
+                        .clickable { dropperMode = false },
+                    painter = painterResource(id = DesignSystemR.drawable.ic_colorpicker),
+                    contentDescription = null
+                )
+            } else {
+                Image(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(35.dp)
+                        .align(Alignment.BottomStart)
+                        .clickable { dropperMode = true },
+                    painter = painterResource(id = DesignSystemR.drawable.ic_dropper),
+                    contentDescription = null
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ImageDropper(
+    modifier: Modifier = Modifier,
+    imageBitmap: Bitmap,
+    selectColor: (Color) -> Unit,
+) {
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    var canvasSize by remember { mutableStateOf(IntSize.Zero) }
+
+    Box(modifier = modifier) {
+        Image(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .onGloballyPositioned { coordinates ->
+                    canvasSize = coordinates.size
+                }
+                .pointerInput(Unit) {
+                    awaitEachGesture {
+                        val start = awaitFirstDown()
+                        offset = start.position
+                        val startOffset = Offset(
+                            imageBitmap.width * start.position.x / canvasSize.width,
+                            imageBitmap.height * start.position.y / canvasSize.height
+                        )
+                        selectColor(
+                            Color(
+                                imageBitmap.getPixel(
+                                    startOffset.x
+                                        .toInt()
+                                        .coerceIn(0, imageBitmap.width - 1),
+                                    startOffset.y
+                                        .toInt()
+                                        .coerceIn(0, imageBitmap.height - 1)
+                                )
+                            )
+                        )
+
+                        drag(start.id) { change ->
+                            val calculatedOffset = Offset(
+                                imageBitmap.width * change.position.x / canvasSize.width,
+                                imageBitmap.height * change.position.y / canvasSize.height
+                            )
+                            offset = change.position
+                            change.consume()
+                            selectColor(
+                                Color(
+                                    imageBitmap.getPixel(
+                                        calculatedOffset.x
+                                            .toInt()
+                                            .coerceIn(0, imageBitmap.width - 1),
+                                        calculatedOffset.y
+                                            .toInt()
+                                            .coerceIn(0, imageBitmap.height - 1)
+                                    )
+                                )
+                            )
+                        }
+                    }
+                },
+            bitmap = imageBitmap.asImageBitmap(),
+            contentDescription = null
+        )
+
+        val density = LocalDensity.current
+        offset = Offset(canvasSize.width.toFloat() / 2f, canvasSize.height.toFloat() / 2f)
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(
+                    with(density) { canvasSize.width.toDp() },
+                    with(density) { canvasSize.height.toDp() }
+                )
+        ) {
+            drawCircle(
+                color = Color.White,
+                radius = 12.dp.toPx(),
+                center = Offset(
+                    offset.x.coerceIn(0f, canvasSize.width.toFloat()),
+                    offset.y.coerceIn(0f, canvasSize.height.toFloat())
+                )
             )
         }
+    }
+}
+
+@Composable
+@Preview
+fun ImageDropperPreview() {
+    FillSketchTheme {
+        ImageDropper(
+            imageBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                .asAndroidBitmap(),
+            selectColor = {}
+        )
     }
 }
 
@@ -494,9 +665,26 @@ fun DrawingPalettePreview() {
                 actionType = ActionType.BRUSH
             ),
             colorPickerController = colorPickerController,
+            openColorPickerDialog = {},
             updateActionType = {},
             updateStrokeWidth = {},
             updateMagicBrushState = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ColorPickerDialogPreview() {
+    FillSketchTheme {
+        val colorPickerController = rememberColorPickerController()
+        ColorPickerDialog(
+            onDismiss = { },
+            colorPickerController = colorPickerController,
+            sketchType = 0,
+            currentMaskBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                .asAndroidBitmap(),
+            initialColor = Color.Red
         )
     }
 }

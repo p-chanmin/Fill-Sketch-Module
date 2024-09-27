@@ -58,6 +58,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.feature.drawing.component.ColorPickerDialog
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingUiButton
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
@@ -222,12 +223,23 @@ fun DrawingContent(
         }
 
         val colorPickerController = rememberColorPickerController()
+        var colorPaletteDialog by remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
             colorPickerController.selectByColor(drawingUiState.strokeColor, false)
             colorPickerController.getColorFlow().collectLatest { colorEnvelope ->
                 updateColor(colorEnvelope.color)
                 updateActionType(ActionType.BRUSH)
             }
+        }
+
+        if (colorPaletteDialog) {
+            ColorPickerDialog(
+                onDismiss = { colorPaletteDialog = false },
+                colorPickerController = colorPickerController,
+                sketchType = drawingUiState.sketchType,
+                currentMaskBitmap = currentMaskBitmap,
+                initialColor = drawingUiState.strokeColor
+            )
         }
 
         Column(
@@ -275,6 +287,7 @@ fun DrawingContent(
                 DrawingPalette(
                     drawingUiState = drawingUiState,
                     colorPickerController = colorPickerController,
+                    openColorPickerDialog = { colorPaletteDialog = true },
                     updateActionType = updateActionType,
                     updateStrokeWidth = updateStrokeWidth,
                     updateMagicBrushState = updateMagicBrushState,

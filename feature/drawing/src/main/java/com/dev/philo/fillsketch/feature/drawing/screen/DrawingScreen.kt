@@ -208,7 +208,6 @@ fun DrawingContent(
                         .height(30.dp)
                         .width(60.dp),
                     painter = painterResource(id = DesignSystemR.drawable.ic_trash),
-                    enabled = undoPathSize != 0,
                     onClick = { resetDialogVisible = true }
                 )
                 DrawingUiButton(
@@ -216,7 +215,6 @@ fun DrawingContent(
                         .height(30.dp)
                         .width(60.dp),
                     painter = painterResource(id = DesignSystemR.drawable.ic_complete),
-                    enabled = undoPathSize != 0,
                     onClick = { navigateToDrawingResult() }
                 )
             }
@@ -380,7 +378,6 @@ fun DrawingCanvas(
                     translationY = offset.y
                 )
         ) {
-
             Image(
                 bitmap = recommendImageBitmap,
                 contentDescription = null

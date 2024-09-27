@@ -35,11 +35,10 @@ class SketchRepository @Inject constructor(
         fillSketchDataSource.drawingResultList
             .map { drawingResultList ->
                 drawingResultList.map {
-                    val pathDataList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
                     DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
-                        paths = pathDataList
+                        bitmapByteArray = it.bitmapByteArray
                     )
                 }
             }
@@ -48,17 +47,16 @@ class SketchRepository @Inject constructor(
         fillSketchDataSource.drawingResultList
             .map { myWorkSchemaList ->
                 myWorkSchemaList.filter { it.sketchType == sketchType }.map {
-                    val pathDataList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
                     DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
-                        paths = pathDataList
+                        bitmapByteArray = it.bitmapByteArray
                     )
                 }
             }
 
-    suspend fun addDrawingResult(sketchType: Int): Int {
-        return fillSketchDataSource.addDrawingResult(sketchType)
+    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Int {
+        return fillSketchDataSource.addDrawingResult(sketchType, latestByteArray)
     }
 
     suspend fun deleteDrawingResult(drawingResultId: Int) {

@@ -1,30 +1,29 @@
 package com.dev.philo.fillsketch.feature.home.model
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.dev.philo.fillsketch.core.model.DrawingResult
 
 data class MyWork(
     val id: Int = 0,
     val sketchType: Int = 0,
-    val paths: SnapshotStateList<PathWrapper> = mutableStateListOf()
+    val latestBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+    val hasMagicBrush: Boolean = false
 ) {
     companion object {
         fun create(drawingResult: DrawingResult): MyWork = MyWork(
             id = drawingResult.id,
             sketchType = drawingResult.sketchType,
-            paths = drawingResult.paths.map { pathData ->
-                PathWrapper(
-                    points = pathData.points.map { Offset(it.x, it.y) }.toMutableStateList(),
-                    strokeWidth = pathData.strokeWidth,
-                    strokeColor = pathData.strokeColor.let { Color(it.r, it.g, it.b, it.alpha) },
-                    actionType = pathData.actionType,
-                )
-            }.toMutableStateList()
+            latestBitmap = byteArrayToBitmap(drawingResult.bitmapByteArray),
+            hasMagicBrush = drawingResult.hasMagicBrush
         )
+
+        private fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+            return if (byteArray.isEmpty()) {
+                Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            } else {
+                BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            }
+        }
     }
 }

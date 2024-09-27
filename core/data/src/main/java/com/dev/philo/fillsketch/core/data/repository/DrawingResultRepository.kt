@@ -1,11 +1,7 @@
 package com.dev.philo.fillsketch.core.data.repository
 
-import com.dev.philo.fillsketch.core.data.converter.PathDataAdapter
 import com.dev.philo.fillsketch.core.database.datasource.FillSketchDataSource
 import com.dev.philo.fillsketch.core.model.DrawingResult
-import com.dev.philo.fillsketch.core.model.PathData
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -14,21 +10,14 @@ import javax.inject.Inject
 class DrawingResultRepository @Inject constructor(
     private val fillSketchDataSource: FillSketchDataSource
 ) {
-
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(PathData::class.java, PathDataAdapter())
-        .create()
-    private val type = object : TypeToken<List<PathData>>() {}.type
-
     fun getDrawingResult(sketchType: Int, drawingResultId: Int): Flow<DrawingResult> =
         fillSketchDataSource
             .getDrawingResultById(drawingResultId)
             .map {
-                val pathDataList: List<PathData> = gson.fromJson(it.pathsJsonData, type)
                 DrawingResult(
                     id = it._id,
                     sketchType = it.sketchType,
-                    paths = pathDataList,
+                    bitmapByteArray = it.bitmapByteArray,
                     hasMagicBrush = fillSketchDataSource.getMagicBrushStateBySketchType(sketchType)
                         .first()
                 )
@@ -43,8 +32,8 @@ class DrawingResultRepository @Inject constructor(
 
     suspend fun updateDrawingResult(
         drawingResultId: Int,
-        paths: List<PathData>
+        bitmapByteArray: ByteArray
     ) {
-        fillSketchDataSource.updateDrawingResult(drawingResultId, gson.toJson(paths))
+        fillSketchDataSource.updateDrawingResult(drawingResultId, bitmapByteArray)
     }
 }

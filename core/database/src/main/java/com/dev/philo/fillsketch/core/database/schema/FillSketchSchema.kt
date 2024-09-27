@@ -18,5 +18,5 @@ class DrawingResultSchema : RealmObject {
     @PrimaryKey
     var _id: Int = 0
     var sketchType: Int = -1
-    var pathsJsonData: String = "[]"
+    var bitmapByteArray: ByteArray = ByteArray(0)
 }

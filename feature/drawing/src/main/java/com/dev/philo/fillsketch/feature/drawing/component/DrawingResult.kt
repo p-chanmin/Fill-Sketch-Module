@@ -1,6 +1,7 @@
 package com.dev.philo.fillsketch.feature.drawing.component
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Paint.Style
@@ -37,7 +38,7 @@ import kotlinx.collections.immutable.persistentListOf
 fun DrawingResultImage(
     modifier: Modifier = Modifier,
     sketchType: Int,
-    paths: ImmutableList<PathWrapper>,
+    latestBitmap: Bitmap,
 ) {
 
     val recommendImageBitmap =
@@ -46,43 +47,6 @@ fun DrawingResultImage(
     val outlineImageBitmap =
         ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[sketchType])
 
-    val maskBitmap = getEmptyBitmapBySize(
-        outlineImageBitmap.width,
-        outlineImageBitmap.height,
-        outlineImageBitmap.asAndroidBitmap().density,
-        whiteBackground = true
-    )
-
-    val canvas = Canvas(maskBitmap)
-
-    paths.forEach { path ->
-        val paint = Paint().apply {
-
-            if (path.actionType == ActionType.MAGIC_BRUSH) {
-                xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-            }
-
-            color = if (path.actionType == ActionType.ERASER) {
-                android.graphics.Color.WHITE
-            } else {
-                android.graphics.Color.argb(
-                    (path.strokeColor.alpha * 255).toInt(),
-                    (path.strokeColor.red * 255).toInt(),
-                    (path.strokeColor.green * 255).toInt(),
-                    (path.strokeColor.blue * 255).toInt()
-                )
-            }
-            strokeWidth = path.strokeWidth
-            style = Style.STROKE
-            isAntiAlias = true
-
-            strokeCap = Paint.Cap.ROUND
-        }
-
-        val pathObj = createPath(path.points.map { Offset(it.x, it.y) })
-
-        canvas.drawPath(pathObj, paint)
-    }
     Surface(
         modifier = modifier
             .border(
@@ -101,7 +65,7 @@ fun DrawingResultImage(
             )
 
             Image(
-                bitmap = maskBitmap.asImageBitmap(),
+                bitmap = latestBitmap.asImageBitmap(),
                 contentDescription = null
             )
 
@@ -120,18 +84,7 @@ fun DrawingResultImagePreview() {
     FillSketchTheme {
         DrawingResultImage(
             sketchType = 0,
-            paths = persistentListOf(
-                PathWrapper(
-                    points = mutableStateListOf(
-                        Offset(0f, 0f),
-                        Offset(0f, 0f),
-                        Offset(1000f, 1000f),
-                    ),
-                    strokeWidth = 40f,
-                    strokeColor = Color.Red,
-                    actionType = ActionType.BRUSH,
-                )
-            )
+            latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0]).asAndroidBitmap()
         )
     }
 }

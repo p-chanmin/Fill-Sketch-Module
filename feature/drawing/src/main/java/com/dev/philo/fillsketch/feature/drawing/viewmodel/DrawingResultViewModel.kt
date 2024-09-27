@@ -18,7 +18,6 @@ import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingResultUiState
 import com.dev.philo.fillsketch.feature.drawing.model.MyWork
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -47,17 +46,19 @@ class DrawingResultViewModel @Inject constructor(
                 )
             _drawingResultUiState.update {
                 it.copy(
-                    paths = myWork.paths.toPersistentList()
+                    latestBitmap = myWork.latestBitmap
                 )
             }
         }
     }
 
     fun updateSaveCompleteDialogVisible(state: Boolean) {
-        _drawingResultUiState.update {
-            it.copy(
-                saveCompleteDialogVisible = state
-            )
+        viewModelScope.launch {
+            _drawingResultUiState.update {
+                it.copy(
+                    saveCompleteDialogVisible = state
+                )
+            }
         }
     }
 
@@ -68,43 +69,7 @@ class DrawingResultViewModel @Inject constructor(
         val recommendAndroidBitmap = recommendImageBitmap.asAndroidBitmap()
         val outlineAndroidBitmap = outlineImageBitmap.asAndroidBitmap()
 
-        val maskAndroidBitmap = getEmptyBitmapBySize(
-            recommendAndroidBitmap.width,
-            recommendAndroidBitmap.height,
-            recommendAndroidBitmap.density,
-            whiteBackground = true
-        )
-
-        val maskCanvas = Canvas(maskAndroidBitmap)
-
-        _drawingResultUiState.value.paths.forEach { path ->
-            val paint = Paint().apply {
-
-                if (path.actionType == ActionType.MAGIC_BRUSH) {
-                    xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-                }
-
-                color = if (path.actionType == ActionType.ERASER) {
-                    android.graphics.Color.WHITE
-                } else {
-                    android.graphics.Color.argb(
-                        (path.strokeColor.alpha * 255).toInt(),
-                        (path.strokeColor.red * 255).toInt(),
-                        (path.strokeColor.green * 255).toInt(),
-                        (path.strokeColor.blue * 255).toInt()
-                    )
-                }
-                strokeWidth = path.strokeWidth
-                style = Style.STROKE
-                isAntiAlias = true
-
-                strokeCap = Paint.Cap.ROUND
-            }
-
-            val pathObj = createPath(path.points.map { Offset(it.x, it.y) })
-
-            maskCanvas.drawPath(pathObj, paint)
-        }
+        _drawingResultUiState.value.latestBitmap.density = recommendAndroidBitmap.density
 
         val resultBitmap = getEmptyBitmapBySize(
             recommendAndroidBitmap.width,
@@ -112,11 +77,12 @@ class DrawingResultViewModel @Inject constructor(
             recommendAndroidBitmap.density,
             whiteBackground = true
         )
+
         val resultCanvas = Canvas(resultBitmap)
         val paint = Paint()
 
         resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
-        resultCanvas.drawBitmap(maskAndroidBitmap, 0f, 0f, paint)
+        resultCanvas.drawBitmap(_drawingResultUiState.value.latestBitmap, 0f, 0f, paint)
         resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
 
         return resultBitmap

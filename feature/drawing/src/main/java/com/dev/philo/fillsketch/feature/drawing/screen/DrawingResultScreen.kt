@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
@@ -114,7 +115,7 @@ fun DrawingResultScreen(
                     context.contentResolver.openOutputStream(it).use { outputStream ->
                         outputStream?.let {
                             resultBitmap.compress(
-                                Bitmap.CompressFormat.JPEG,
+                                Bitmap.CompressFormat.PNG,
                                 100,
                                 it
                             )
@@ -167,7 +168,7 @@ fun DrawingResultContent(
                     .width(400.dp)
                     .padding(Paddings.xextra),
                 sketchType = sketchType,
-                paths = drawingResultUiState.paths
+                latestBitmap = drawingResultUiState.latestBitmap
             )
 
             Row(
@@ -249,18 +250,7 @@ fun DrawingResultContentPreview() {
             sketchType = 0,
             drawingResultUiState = DrawingResultUiState(
                 saveCompleteDialogVisible = false,
-                paths = persistentListOf(
-                    PathWrapper(
-                        points = mutableStateListOf(
-                            Offset(0f, 0f),
-                            Offset(0f, 0f),
-                            Offset(1000f, 1000f),
-                        ),
-                        strokeWidth = 40f,
-                        strokeColor = Color.Red,
-                        actionType = ActionType.BRUSH,
-                    )
-                )
+                latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0]).asAndroidBitmap()
             ),
             navigateToDrawing = {},
             dismissSaveCompleteDialog = {},

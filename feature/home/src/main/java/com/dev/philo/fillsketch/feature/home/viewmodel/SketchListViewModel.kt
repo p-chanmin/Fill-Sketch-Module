@@ -1,5 +1,8 @@
 package com.dev.philo.fillsketch.feature.home.viewmodel
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.philo.fillsketch.core.data.repository.SketchRepository
@@ -19,6 +22,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,10 +56,9 @@ class SketchListViewModel @Inject constructor(
             }.toPersistentList()
     }
 
-    fun selectSketch(sketchType: Int) {
+    fun selectSketch(sketchType: Int, width: Int, height: Int, dpi: Int) {
         viewModelScope.launch {
             if (_sketchListUiState.value.selectedSketchId == null) {
-
                 if (_sketchListUiState.value.sketchList[sketchType].isLocked) {
                     _sketchListUiState.update {
                         it.copy(
@@ -67,7 +70,7 @@ class SketchListViewModel @Inject constructor(
                     val myWorks = getMyWorksBySketchType(sketchType)
 
                     if (myWorks.isEmpty()) {
-                        addMyWork(sketchType)
+                        addMyWork(sketchType, width, height, dpi)
                     } else {
                         _sketchListUiState.update {
                             it.copy(
@@ -78,28 +81,12 @@ class SketchListViewModel @Inject constructor(
                         }
                     }
                 }
-
-            } else {
-                _sketchListUiState.update {
-                    it.copy(
-                        selectedSketchId = null,
-                        myWorks = persistentListOf(),
-                        dialogMyWorksVisible = false,
-                        dialogUnlockVisible = false
-                    )
-                }
             }
         }
     }
 
-    fun addMyWork(sketchType: Int) {
+    fun dismissDialog() {
         viewModelScope.launch {
-            _uiEventFlow.emit(
-                SketchListUiEvent.NavigateToDrawing(
-                    sketchType,
-                    sketchRepository.addDrawingResult(sketchType)
-                )
-            )
             _sketchListUiState.update {
                 it.copy(
                     selectedSketchId = null,
@@ -108,6 +95,21 @@ class SketchListViewModel @Inject constructor(
                     dialogUnlockVisible = false
                 )
             }
+        }
+    }
+
+    fun addMyWork(sketchType: Int, width: Int, height: Int, dpi: Int) {
+        viewModelScope.launch {
+            dismissDialog()
+            _uiEventFlow.emit(
+                SketchListUiEvent.NavigateToDrawing(
+                    sketchType,
+                    sketchRepository.addDrawingResult(
+                        sketchType,
+                        bitmapToByteArray(createEmptyBitmap(width, height, dpi))
+                    )
+                )
+            )
         }
     }
 
@@ -126,5 +128,26 @@ class SketchListViewModel @Inject constructor(
         viewModelScope.launch {
             sketchRepository.updateLockState(sketchType, isLocked = false)
         }
+    }
+
+    private fun createEmptyBitmap(width: Int, height: Int, dpi: Int): Bitmap {
+        return Bitmap.createBitmap(
+            width,
+            height,
+            Bitmap.Config.ARGB_8888,
+        ).apply {
+            density = dpi
+            val canvas = Canvas(this)
+            val paint = Paint().apply {
+                color = android.graphics.Color.WHITE
+            }
+            canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        }
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
     }
 }

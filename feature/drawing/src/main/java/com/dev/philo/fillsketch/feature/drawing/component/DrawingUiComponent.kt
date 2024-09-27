@@ -462,20 +462,22 @@ fun ColorPickerDialog(
                     val recommendAndroidBitmap =
                         ImageBitmap.imageResource(SketchResource.sketchRecommendResourceIds[sketchType])
                             .asAndroidBitmap()
+                    val maskBitmap = currentMaskBitmap.copy(Bitmap.Config.ARGB_8888, true)
+                    maskBitmap.density = recommendAndroidBitmap.density
                     val outlineAndroidBitmap =
                         ImageBitmap.imageResource(SketchResource.sketchOutlineResourceIds[sketchType])
                             .asAndroidBitmap()
                     val resultBitmap = getEmptyBitmapBySize(
-                        currentMaskBitmap.width,
-                        currentMaskBitmap.height,
-                        currentMaskBitmap.density,
+                        maskBitmap.width,
+                        maskBitmap.height,
+                        maskBitmap.density,
                         whiteBackground = true
                     )
                     val resultCanvas = Canvas(resultBitmap)
                     val paint = Paint()
 
                     resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
-                    resultCanvas.drawBitmap(currentMaskBitmap, 0f, 0f, paint)
+                    resultCanvas.drawBitmap(maskBitmap, 0f, 0f, paint)
                     resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
 
                     val result = remember { mutableStateOf(resultBitmap) }

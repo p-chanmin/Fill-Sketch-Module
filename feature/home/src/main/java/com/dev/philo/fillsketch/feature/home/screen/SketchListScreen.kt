@@ -30,7 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +56,6 @@ import com.dev.philo.fillsketch.feature.home.model.SketchListUiEvent
 import com.dev.philo.fillsketch.feature.home.model.SketchListUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.SketchListViewModel
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.collectLatest
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
@@ -86,7 +88,8 @@ fun SketchListScreen(
         selectSketch = sketchListViewModel::selectSketch,
         unlockSketch = sketchListViewModel::unlockSketch,
         addMyWork = sketchListViewModel::addMyWork,
-        deleteMyWork = sketchListViewModel::deleteMyWork
+        deleteMyWork = sketchListViewModel::deleteMyWork,
+        dismissDialog = sketchListViewModel::dismissDialog
     )
 
 }
@@ -97,10 +100,11 @@ fun SketchListContent(
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
     sketchListUiState: SketchListUiState = SketchListUiState(),
-    selectSketch: (Int) -> Unit,
+    selectSketch: (Int, Int, Int, Int) -> Unit,
     unlockSketch: (Int) -> Unit,
-    addMyWork: (Int) -> Unit,
+    addMyWork: (Int, Int, Int, Int) -> Unit,
     deleteMyWork: (Int, Int) -> Unit,
+    dismissDialog: () -> Unit
 ) {
 
     val lazyGridState = rememberLazyGridState()
@@ -155,13 +159,19 @@ fun SketchListContent(
                 horizontalArrangement = Arrangement.spacedBy(Paddings.medium),
             ) {
                 items(sketchListUiState.sketchList, key = { it.sketchType }) {
+                    val imageBitmap =
+                        ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[it.sketchType])
                     FillSketchCard(
-                        painter = painterResource(id = SketchResource.sketchOutlineResourceIds[it.sketchType]),
+                        imageBitmap = imageBitmap,
                         isLock = it.isLocked
                     ) {
-                        selectSketch(it.sketchType)
+                        selectSketch(
+                            it.sketchType,
+                            imageBitmap.width,
+                            imageBitmap.height,
+                            imageBitmap.asAndroidBitmap().density
+                        )
                     }
-
 
                 }
             }
@@ -170,13 +180,16 @@ fun SketchListContent(
         if (sketchListUiState.dialogMyWorksVisible && sketchListUiState.selectedSketchId != null) {
             FillSketchDialog(
                 titleText = "Select Work !",
-                onDismissRequest = { selectSketch(sketchListUiState.selectedSketchId) }
+                onDismissRequest = { dismissDialog() }
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
+                        val imageBitmap =
+                            ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[sketchListUiState.selectedSketchId])
+                                .asAndroidBitmap()
                         FillSketchSettingButton(
                             modifier = Modifier
                                 .padding(top = Paddings.large)
@@ -185,7 +198,12 @@ fun SketchListContent(
                             painter = painterResource(id = R.drawable.ic_plus),
                             color = MaterialTheme.colorScheme.onPrimary,
                             onClick = {
-                                addMyWork(sketchListUiState.selectedSketchId)
+                                addMyWork(
+                                    sketchListUiState.selectedSketchId,
+                                    imageBitmap.width,
+                                    imageBitmap.height,
+                                    imageBitmap.density
+                                )
                             }
                         )
                     }
@@ -196,9 +214,9 @@ fun SketchListContent(
 
                         MyWorkImage(
                             sketchType = it.sketchType,
-                            paths = it.paths.toPersistentList(),
+                            latestBitmap = it.latestBitmap,
                             onClick = {
-                                selectSketch(sketchListUiState.selectedSketchId)
+                                dismissDialog()
                                 navigateToDrawing(it.sketchType, it.id)
                             },
                             onDeleteClick = { deleteDialog = true }
@@ -250,7 +268,7 @@ fun SketchListContent(
 
         if (sketchListUiState.dialogUnlockVisible && sketchListUiState.selectedSketchId != null) {
             FillSketchDialog(
-                onDismissRequest = { selectSketch(sketchListUiState.selectedSketchId) }
+                onDismissRequest = { dismissDialog() }
             ) {
                 val scrollState = rememberScrollState()
                 Column(
@@ -261,7 +279,7 @@ fun SketchListContent(
                 ) {
                     FillSketchCard(
                         modifier = Modifier.width(200.dp),
-                        painter = painterResource(id = SketchResource.sketchOutlineResourceIds[sketchListUiState.selectedSketchId]),
+                        imageBitmap = ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[sketchListUiState.selectedSketchId]),
                         onClick = {}
                     )
                     FillSketchSettingButton(
@@ -274,7 +292,7 @@ fun SketchListContent(
                         onClick = {
                             // 광고 보기
                             unlockSketch(sketchListUiState.selectedSketchId)
-                            selectSketch(sketchListUiState.selectedSketchId)
+                            dismissDialog()
                         }
                     )
                 }
@@ -315,10 +333,11 @@ fun SketchListContentPreview() {
                 dialogUnlockVisible = true,
                 dialogMyWorksVisible = false
             ),
-            selectSketch = {},
+            selectSketch = { _, _, _, _ -> },
             unlockSketch = {},
-            addMyWork = {},
-            deleteMyWork = { _, _ -> }
+            addMyWork = { _, _, _, _ -> },
+            deleteMyWork = { _, _ -> },
+            dismissDialog = {}
         )
     }
 }

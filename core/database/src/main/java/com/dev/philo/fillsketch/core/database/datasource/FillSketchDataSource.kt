@@ -26,7 +26,7 @@ class FillSketchDataSource @Inject constructor(
     val drawingResultList = realm
         .query<DrawingResultSchema>()
         .asFlow()
-        .map { it.list.toList() }
+        .map { it.list.toList().reversed() }
 
     fun getMagicBrushStateBySketchType(sketchType: Int) =
         realm.query<SketchSchema>("sketchType == $0", sketchType).asFlow().map { it.list.first().hasMagicBrush }
@@ -34,7 +34,7 @@ class FillSketchDataSource @Inject constructor(
     fun getDrawingResultById(drawingResultId: Int) =
         realm.query<DrawingResultSchema>("_id == $0", drawingResultId).asFlow().map { it.list.first() }
 
-    suspend fun addDrawingResult(sketchType: Int): Int {
+    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Int {
 
         val id = getNextDrawingResultPrimaryKey()
 
@@ -43,6 +43,7 @@ class FillSketchDataSource @Inject constructor(
                 DrawingResultSchema().apply {
                     this._id = id
                     this.sketchType = sketchType
+                    this.bitmapByteArray = latestByteArray
                 }
             )
         }
@@ -80,11 +81,11 @@ class FillSketchDataSource @Inject constructor(
 
     suspend fun updateDrawingResult(
         drawingResultId: Int,
-        pathsJsonData: String
+        bitmapByteArray: ByteArray
     ) {
         realm.write {
             val drawingResult = query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
-            drawingResult.pathsJsonData = pathsJsonData
+            drawingResult.bitmapByteArray = bitmapByteArray
         }
     }
 

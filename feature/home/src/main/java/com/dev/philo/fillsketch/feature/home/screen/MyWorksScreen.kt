@@ -29,7 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
@@ -134,7 +138,7 @@ fun MyWorksContent(
 
                     MyWorkImage(
                         sketchType = it.sketchType,
-                        paths = it.paths.toPersistentList(),
+                        latestBitmap = it.latestBitmap,
                         onClick = { navigateToDrawingResult(it.sketchType, it.id) },
                         onDeleteClick = { deleteDialog = true },
                     )
@@ -196,23 +200,14 @@ fun MyWorksContentPreview() {
                     MyWork(
                         id = 0,
                         sketchType = 0,
-                        paths = mutableStateListOf(
-                            PathWrapper(
-                                points = mutableStateListOf(
-                                    Offset(0f, 0f),
-                                    Offset(0f, 0f),
-                                    Offset(1000f, 1000f),
-                                ),
-                                strokeWidth = 40f,
-                                strokeColor = Color.Red,
-                                actionType = ActionType.BRUSH,
-                            )
-                        )
+                        latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                            .asAndroidBitmap()
                     ),
                     MyWork(
                         id = 1,
                         sketchType = 9,
-                        paths = mutableStateListOf()
+                        latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[1])
+                            .asAndroidBitmap()
                     )
                 )
             ),

@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -67,13 +68,10 @@ class DrawingViewModel @Inject constructor(
         dpi: Int
     ) {
         viewModelScope.launch {
-            val myWork =
-                MyWork.create(
+            val myWork = MyWork.create(
                     drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
                 )
-            _undoPathList.addAll(myWork.paths)
-            currentMaskBitmap.value =
-                getEmptyBitmapBySize(width, height, dpi, whiteBackground = true)
+            currentMaskBitmap.value = myWork.latestBitmap
             liveDrawingMaskBitmap.value =
                 getEmptyBitmapBySize(width, height, dpi, whiteBackground = false)
             _drawingUiState.update {
@@ -83,6 +81,7 @@ class DrawingViewModel @Inject constructor(
                     width = width,
                     height = height,
                     dpi = dpi,
+                    latestBitmap = myWork.latestBitmap,
                     hasMagicBrush = myWork.hasMagicBrush
                 )
             }
@@ -149,7 +148,7 @@ class DrawingViewModel @Inject constructor(
     fun reset() {
         _redoPathList.clear()
         _undoPathList.clear()
-        drawOnNewMask()
+        drawOnNewMask(newMask = true)
     }
 
     fun insertNewPath(newPoint: Offset) {
@@ -170,13 +169,17 @@ class DrawingViewModel @Inject constructor(
         drawOnLivePath()
     }
 
-    fun drawOnNewMask() {
-        val maskBitmap = getEmptyBitmapBySize(
-            _drawingUiState.value.width,
-            _drawingUiState.value.height,
-            _drawingUiState.value.dpi,
-            whiteBackground = true
-        )
+    fun drawOnNewMask(newMask: Boolean = false) {
+        val maskBitmap = if (newMask) {
+            getEmptyBitmapBySize(
+                _drawingUiState.value.width,
+                _drawingUiState.value.height,
+                _drawingUiState.value.dpi,
+                true
+            )
+        } else {
+            _drawingUiState.value.latestBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        }
 
         val canvas = Canvas(maskBitmap)
 
@@ -270,7 +273,13 @@ class DrawingViewModel @Inject constructor(
     private suspend fun saveCurrentDrawingResult() {
         drawingResultRepository.updateDrawingResult(
             _drawingUiState.value.drawingResultId,
-            _undoPathList.map { it.toPathData() }
+            bitmapToByteArray(currentMaskBitmap.value)
         )
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
     }
 }

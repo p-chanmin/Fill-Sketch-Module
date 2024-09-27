@@ -39,10 +39,12 @@ class DrawingResultViewModel @Inject constructor(
     private val _drawingResultUiState = MutableStateFlow(DrawingResultUiState())
     val drawingResultUiState = _drawingResultUiState.asStateFlow()
 
-    fun fetchDrawingUiState(drawingResultId: Int) {
+    fun fetchDrawingUiState(sketchType: Int, drawingResultId: Int) {
         viewModelScope.launch {
             val myWork =
-                MyWork.create(drawingResultRepository.getDrawingResult(drawingResultId).first())
+                MyWork.create(
+                    drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
+                )
             _drawingResultUiState.update {
                 it.copy(
                     paths = myWork.paths.toPersistentList()

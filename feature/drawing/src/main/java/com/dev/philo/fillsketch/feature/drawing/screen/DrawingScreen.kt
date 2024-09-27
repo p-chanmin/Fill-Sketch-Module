@@ -1,6 +1,11 @@
 package com.dev.philo.fillsketch.feature.drawing.screen
 
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -14,17 +19,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,24 +38,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.asset.SketchResource
+import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
+import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
+import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
+import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
+import com.dev.philo.fillsketch.feature.drawing.component.DrawingUiButton
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
 import com.dev.philo.fillsketch.feature.drawing.viewmodel.DrawingViewModel
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
 @Composable
 fun DrawingScreen(
@@ -70,6 +84,7 @@ fun DrawingScreen(
 
     LaunchedEffect(Unit) {
         drawingViewModel.fetchDrawingUiState(
+            sketchType,
             drawingResultId,
             recommendImageBitmap.width,
             recommendImageBitmap.height,
@@ -99,6 +114,7 @@ fun DrawingScreen(
         updateColor = drawingViewModel::updateColor,
         updateStrokeWidth = drawingViewModel::updateStrokeWidth,
         updateActionType = drawingViewModel::updateActionType,
+        updateMagicBrushState = drawingViewModel::updateMagicBrushState,
         onBackClick = onBackClick,
         navigateToDrawingResult = { navigateToDrawingResult(sketchType, drawingResultId) },
     )
@@ -123,13 +139,28 @@ fun DrawingContent(
     updateColor: (Color) -> Unit,
     updateStrokeWidth: (Float) -> Unit,
     updateActionType: (ActionType) -> Unit,
+    updateMagicBrushState: () -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawingResult: () -> Unit,
 ) {
     Box(
         modifier = modifier
     ) {
+        var scale by remember { mutableFloatStateOf(1f) }
+        var offset by remember { mutableStateOf(Offset.Zero) }
+        var paletteVisible by remember { mutableStateOf(true) }
+        var resetDialogVisible by remember { mutableStateOf(false) }
+
+        val minScale = 0.6f
+        val maxScale = 8f
+
         DrawingCanvas(
+            scale = scale,
+            offset = offset,
+            onDrag = { pan, zoom ->
+                scale = (scale * zoom).coerceIn(minScale, maxScale)
+                offset = Offset((offset.x + pan.x * scale), (offset.y + pan.y * scale))
+            },
             drawingUiState = drawingUiState,
             outlineImageBitmap = outlineImageBitmap,
             recommendImageBitmap = recommendImageBitmap,
@@ -143,123 +174,162 @@ fun DrawingContent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(top = Paddings.extra)
+                .padding(horizontal = Paddings.large),
         ) {
-            Button(
+            DrawingUiButton(
+                modifier = Modifier.size(30.dp),
+                painter = painterResource(id = DesignSystemR.drawable.ic_left),
                 onClick = { onBackClick() }
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text(text = "Back")
-            }
-            Button(
-                enabled = undoPathSize != 0,
-                onClick = { undo() }
-            ) {
-                Text(text = "UnDo")
-            }
-            Button(
-                enabled = redoPathSize != 0,
-                onClick = { redo() }
-            ) {
-                Text(text = "ReDo")
-            }
-            Button(
-                enabled = undoPathSize != 0,
-                onClick = { reset() }
-            ) {
-                Text(text = "Reset")
-            }
-
-            Button(
-                enabled = undoPathSize != 0,
-                onClick = {
-                    navigateToDrawingResult()
-                }
-            ) {
-                Text(text = "Save")
+                DrawingUiButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(60.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_undo),
+                    enabled = undoPathSize != 0,
+                    onClick = { undo() }
+                )
+                DrawingUiButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(60.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_redo),
+                    enabled = redoPathSize != 0,
+                    onClick = { redo() }
+                )
+                DrawingUiButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(60.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_trash),
+                    enabled = undoPathSize != 0,
+                    onClick = { resetDialogVisible = true }
+                )
+                DrawingUiButton(
+                    modifier = Modifier
+                        .height(30.dp)
+                        .width(60.dp),
+                    painter = painterResource(id = DesignSystemR.drawable.ic_complete),
+                    enabled = undoPathSize != 0,
+                    onClick = { navigateToDrawingResult() }
+                )
             }
         }
 
         val colorPickerController = rememberColorPickerController()
         LaunchedEffect(Unit) {
-            println("LaunchedEffect start")
             colorPickerController.selectByColor(drawingUiState.strokeColor, false)
             colorPickerController.getColorFlow().collectLatest { colorEnvelope ->
-                println(colorEnvelope.color)
+                updateColor(colorEnvelope.color)
+                updateActionType(ActionType.BRUSH)
             }
         }
 
-        DrawingPalette(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            drawingUiState = drawingUiState,
-            colorPickerController = colorPickerController,
-            updateActionType = updateActionType
-        )
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = Paddings.large),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = Paddings.large)
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    verticalArrangement = Arrangement.spacedBy(Paddings.large)
+                ) {
+                    DrawingUiButton(
+                        modifier = Modifier.size(30.dp),
+                        painter = if (paletteVisible) {
+                            painterResource(id = DesignSystemR.drawable.ic_hide_down)
+                        } else {
+                            painterResource(id = DesignSystemR.drawable.ic_hide_up)
+                        },
+                        onClick = {
+                            paletteVisible = !paletteVisible
+                        }
+                    )
+                    DrawingUiButton(
+                        modifier = Modifier.size(30.dp),
+                        painter = painterResource(id = DesignSystemR.drawable.ic_screen),
+                        onClick = {
+                            offset = Offset.Zero
+                            scale = 1f
+                        }
+                    )
+                }
+            }
 
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomCenter)
-//                .fillMaxWidth()
-//        ) {
-//            Row(
-//                modifier = Modifier,
-//            ) {
-//                Button(
-//                    onClick = {
-//                        val colors = listOf(
-//                            Color.Red,
-//                            Color.Blue,
-//                            Color.Green,
-//                            Color.Yellow,
-//                            Color.Cyan,
-//                            Color.Magenta
-//                        )
-//                        val color = colors.random()
-//                        updateColor(color)
-//                        updateActionType(ActionType.BRUSH)
-//                    }
-//                ) {
-//                    Text(text = "Color Change")
-//                }
-//            }
-//            Row {
-//                Button(
-//                    enabled = drawingUiState.actionType != ActionType.MOVE,
-//                    onClick = { updateActionType(ActionType.MOVE) }
-//                ) {
-//                    Text(text = "Move")
-//                }
-//                Button(
-//                    enabled = drawingUiState.actionType != ActionType.BRUSH,
-//                    onClick = {
-//                        updateActionType(ActionType.BRUSH)
-//                    }
-//                ) {
-//                    Text(text = "Brush")
-//                }
-//                Button(
-//                    enabled = drawingUiState.actionType != ActionType.ERASER,
-//                    onClick = {
-//                        updateActionType(ActionType.ERASER)
-//                    }
-//                ) {
-//                    Text(text = "ERASER")
-//                }
-//                Button(
-//                    enabled = drawingUiState.actionType != ActionType.MAGIC_BRUSH,
-//                    onClick = {
-//                        updateActionType(ActionType.MAGIC_BRUSH)
-//                    }
-//                ) {
-//                    Text(text = "Magic")
-//                }
-//            }
-//        }
+            AnimatedVisibility(
+                visible = paletteVisible,
+                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
+            ) {
+                DrawingPalette(
+                    drawingUiState = drawingUiState,
+                    colorPickerController = colorPickerController,
+                    updateActionType = updateActionType,
+                    updateStrokeWidth = updateStrokeWidth,
+                    updateMagicBrushState = updateMagicBrushState,
+                )
+            }
+        }
+
+        if (resetDialogVisible) {
+            FillSketchDialog(
+                onDismissRequest = { resetDialogVisible = false }
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedText(
+                        modifier = Modifier.padding(horizontal = Paddings.medium),
+                        textModifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = Paddings.xextra),
+                        text = "Once you reset, you cannot revert.\nDo you want to reset?",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.tertiary,
+                            lineHeight = 20.sp
+                        ),
+                        outlineColor = MaterialTheme.colorScheme.onTertiary,
+                        outlineDrawStyle = Stroke(
+                            width = 10f,
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+
+                    FillSketchSettingButton(
+                        modifier = Modifier
+                            .padding(top = Paddings.xextra)
+                            .height(60.dp)
+                            .width(200.dp),
+                        painter = painterResource(id = DesignSystemR.drawable.ic_trash),
+                        text = "reset",
+                        onClick = {
+                            reset()
+                            resetDialogVisible = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun DrawingCanvas(
+    scale: Float,
+    offset: Offset,
+    onDrag: (Offset, Float) -> Unit,
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
     outlineImageBitmap: ImageBitmap,
@@ -270,13 +340,7 @@ fun DrawingCanvas(
     updateLatestPath: (Offset) -> Unit,
     drawOnNewMask: () -> Unit
 ) {
-
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
-
-    val minScale = 0.6f
-    val maxScale = 8f
 
     Box(
         modifier = modifier
@@ -284,12 +348,11 @@ fun DrawingCanvas(
             .pointerInput(drawingUiState.actionType) {
                 if (drawingUiState.actionType == ActionType.MOVE) {
                     detectTransformGestures { _, pan, zoom, _ ->
-                        scale = (scale * zoom).coerceIn(minScale, maxScale)
-                        offset = Offset((offset.x + pan.x * scale), (offset.y + pan.y * scale))
+                        onDrag(pan, zoom)
                     }
                 }
             }
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.scrim)
     ) {
         Box(
             modifier = Modifier
@@ -384,6 +447,7 @@ fun DrawingContentPreview() {
             updateColor = { },
             updateStrokeWidth = { },
             updateActionType = { },
+            updateMagicBrushState = { },
             onBackClick = { },
             navigateToDrawingResult = { },
         )

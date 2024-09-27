@@ -28,8 +28,11 @@ class FillSketchDataSource @Inject constructor(
         .asFlow()
         .map { it.list.toList() }
 
-    fun getDrawingResultById(myWorkId: Int) =
-        realm.query<DrawingResultSchema>("_id == $0", myWorkId).asFlow().map { it.list.first() }
+    fun getMagicBrushStateBySketchType(sketchType: Int) =
+        realm.query<SketchSchema>("sketchType == $0", sketchType).asFlow().map { it.list.first().hasMagicBrush }
+
+    fun getDrawingResultById(drawingResultId: Int) =
+        realm.query<DrawingResultSchema>("_id == $0", drawingResultId).asFlow().map { it.list.first() }
 
     suspend fun addDrawingResult(sketchType: Int): Int {
 

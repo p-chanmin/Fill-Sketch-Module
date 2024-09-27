@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -57,10 +59,18 @@ class DrawingViewModel @Inject constructor(
         getEmptyBitmapBySize(1, 1, 160, whiteBackground = false)
     )
 
-    fun fetchDrawingUiState(drawingResultId: Int, width: Int, height: Int, dpi: Int) {
+    fun fetchDrawingUiState(
+        sketchType: Int,
+        drawingResultId: Int,
+        width: Int,
+        height: Int,
+        dpi: Int
+    ) {
         viewModelScope.launch {
             val myWork =
-                MyWork.create(drawingResultRepository.getDrawingResult(drawingResultId).first())
+                MyWork.create(
+                    drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
+                )
             _undoPathList.addAll(myWork.paths)
             currentMaskBitmap.value =
                 getEmptyBitmapBySize(width, height, dpi, whiteBackground = true)
@@ -72,10 +82,24 @@ class DrawingViewModel @Inject constructor(
                     sketchType = myWork.sketchType,
                     width = width,
                     height = height,
-                    dpi = dpi
+                    dpi = dpi,
+                    hasMagicBrush = myWork.hasMagicBrush
                 )
             }
             drawOnNewMask()
+        }
+        drawingResultRepository.getMagicBrushState(sketchType).onEach { hasMagicBrush ->
+            _drawingUiState.update {
+                it.copy(
+                    hasMagicBrush = hasMagicBrush
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun updateMagicBrushState() {
+        viewModelScope.launch {
+            drawingResultRepository.updateMagicBrushState(_drawingUiState.value.sketchType, true)
         }
     }
 
@@ -174,10 +198,9 @@ class DrawingViewModel @Inject constructor(
                     )
                 }
                 strokeWidth = path.strokeWidth
-                style = Style.STROKE // Stroke 스타일 설정
-                isAntiAlias = true // 안티앨리어싱 활성화
-
-                strokeCap = Paint.Cap.ROUND // ROUND(둥근), SQUARE(각진 끝), BUTT(평평한 끝)
+                style = Style.STROKE
+                isAntiAlias = true
+                strokeCap = Paint.Cap.ROUND
             }
 
             val pathObj = createPath(path.points)
@@ -229,10 +252,9 @@ class DrawingViewModel @Inject constructor(
                     )
                 }
                 strokeWidth = path.strokeWidth
-                style = Style.STROKE // Stroke 스타일 설정
-                isAntiAlias = true // 안티앨리어싱 활성화
-
-                strokeCap = Paint.Cap.ROUND // ROUND(둥근), SQUARE(각진 끝), BUTT(평평한 끝)
+                style = Style.STROKE
+                isAntiAlias = true
+                strokeCap = Paint.Cap.ROUND
             }
             val pathObj = createPath(path.points)
             canvas.drawPath(pathObj, paint)

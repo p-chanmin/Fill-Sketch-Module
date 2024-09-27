@@ -74,7 +74,7 @@ fun DrawingResultScreen(
         ImageBitmap.imageResource(SketchResource.sketchOutlineResourceIds[sketchType])
 
     LaunchedEffect(Unit) {
-        drawingResultViewModel.fetchDrawingUiState(drawingResultId)
+        drawingResultViewModel.fetchDrawingUiState(sketchType, drawingResultId)
     }
 
     val drawingResultUiState by drawingResultViewModel.drawingResultUiState.collectAsStateWithLifecycle()

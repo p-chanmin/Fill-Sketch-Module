@@ -11,7 +11,8 @@ import com.dev.philo.fillsketch.core.model.DrawingResult
 data class MyWork(
     val id: Int = 0,
     val sketchType: Int = 0,
-    val paths: SnapshotStateList<PathWrapper> = mutableStateListOf()
+    val paths: SnapshotStateList<PathWrapper> = mutableStateListOf(),
+    val hasMagicBrush: Boolean = false
 ) {
     companion object {
         fun create(drawingResult: DrawingResult): MyWork = MyWork(
@@ -24,7 +25,8 @@ data class MyWork(
                     strokeColor = pathData.strokeColor.let { Color(it.r, it.g, it.b, it.alpha) },
                     actionType = pathData.actionType,
                 )
-            }.toMutableStateList()
+            }.toMutableStateList(),
+            hasMagicBrush = drawingResult.hasMagicBrush
         )
     }
 }

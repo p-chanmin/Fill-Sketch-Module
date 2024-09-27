@@ -44,14 +44,14 @@ fun FillSketchMainButton(
     Surface(
         modifier = modifier
             .border(2.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp))
-            .padding(5.dp)
-            .clickable { onClick() },
+            .padding(5.dp),
         color = MaterialTheme.colorScheme.primary,
         shape = RoundedCornerShape(4.dp),
         shadowElevation = 2.dp,
     ) {
         Box(
             modifier = Modifier.fillMaxSize()
+                .clickable { onClick() }
         ) {
             Image(
                 modifier = Modifier
@@ -107,8 +107,7 @@ fun FillSketchSettingButton(
                 4.dp,
                 MaterialTheme.colorScheme.surfaceContainer,
                 shape = RoundedCornerShape(20.dp)
-            )
-            .clickable { onClick() },
+            ),
         color = color,
         shape = RoundedCornerShape(20.dp),
         shadowElevation = 2.dp,
@@ -116,7 +115,8 @@ fun FillSketchSettingButton(
         Row(
             modifier = Modifier
                 .padding(Paddings.large)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .clickable { onClick() },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {

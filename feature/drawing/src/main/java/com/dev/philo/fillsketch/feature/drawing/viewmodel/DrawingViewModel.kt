@@ -79,14 +79,6 @@ class DrawingViewModel @Inject constructor(
         }
     }
 
-    fun updateAlpha(value: Float) {
-        _drawingUiState.update {
-            it.copy(
-                alpha = value
-            )
-        }
-    }
-
     fun updateColor(value: Color) {
         _drawingUiState.update {
             it.copy(
@@ -140,7 +132,6 @@ class DrawingViewModel @Inject constructor(
         val pathWrapper = PathWrapper(
             points = mutableStateListOf(newPoint),
             strokeColor = _drawingUiState.value.strokeColor,
-            alpha = _drawingUiState.value.alpha,
             actionType = _drawingUiState.value.actionType,
             strokeWidth = _drawingUiState.value.strokeWidth,
         )
@@ -176,7 +167,7 @@ class DrawingViewModel @Inject constructor(
                     android.graphics.Color.WHITE
                 } else {
                     android.graphics.Color.argb(
-                        (path.alpha * 255).toInt(),
+                        (path.strokeColor.alpha * 255).toInt(),
                         (path.strokeColor.red * 255).toInt(),
                         (path.strokeColor.green * 255).toInt(),
                         (path.strokeColor.blue * 255).toInt()
@@ -231,7 +222,7 @@ class DrawingViewModel @Inject constructor(
                     android.graphics.Color.WHITE
                 } else {
                     android.graphics.Color.argb(
-                        (path.alpha * 255).toInt(),
+                        (path.strokeColor.alpha * 255).toInt(),
                         (path.strokeColor.red * 255).toInt(),
                         (path.strokeColor.green * 255).toInt(),
                         (path.strokeColor.blue * 255).toInt()

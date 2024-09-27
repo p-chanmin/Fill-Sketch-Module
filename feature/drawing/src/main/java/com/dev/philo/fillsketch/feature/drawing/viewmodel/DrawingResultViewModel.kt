@@ -86,7 +86,7 @@ class DrawingResultViewModel @Inject constructor(
                     android.graphics.Color.WHITE
                 } else {
                     android.graphics.Color.argb(
-                        (path.alpha * 255).toInt(),
+                        (path.strokeColor.alpha * 255).toInt(),
                         (path.strokeColor.red * 255).toInt(),
                         (path.strokeColor.green * 255).toInt(),
                         (path.strokeColor.blue * 255).toInt()

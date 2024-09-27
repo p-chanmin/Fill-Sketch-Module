@@ -22,12 +22,12 @@ class PathDataAdapter : JsonSerializer<PathData>, JsonDeserializer<PathData> {
         val jsonObject = JsonObject()
         jsonObject.addProperty("actionType", src.actionType.name)
         jsonObject.addProperty("strokeWidth", src.strokeWidth)
-        jsonObject.addProperty("alpha", src.alpha)
 
         val colorJsonObject = JsonObject()
         colorJsonObject.addProperty("r", src.strokeColor.r)
         colorJsonObject.addProperty("g", src.strokeColor.g)
         colorJsonObject.addProperty("b", src.strokeColor.b)
+        colorJsonObject.addProperty("alpha", src.strokeColor.alpha)
         jsonObject.add("strokeColor", colorJsonObject)
 
 
@@ -58,11 +58,11 @@ class PathDataAdapter : JsonSerializer<PathData>, JsonDeserializer<PathData> {
                 StrokeColor(
                     colorJsonObject.get("r").asInt,
                     colorJsonObject.get("g").asInt,
-                    colorJsonObject.get("b").asInt
+                    colorJsonObject.get("b").asInt,
+                    colorJsonObject.get("alpha").asInt
                 )
             },
             strokeWidth = jsonObject.get("strokeWidth").asFloat,
-            alpha = jsonObject.get("alpha").asFloat
         )
         return pathWrapper
     }

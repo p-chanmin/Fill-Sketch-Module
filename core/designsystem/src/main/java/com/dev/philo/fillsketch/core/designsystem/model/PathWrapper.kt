@@ -13,7 +13,6 @@ data class PathWrapper(
     val strokeWidth: Float,
     val strokeColor: Color,
     val actionType: ActionType,
-    val alpha: Float
 ) {
     companion object {
         fun PathWrapper.toPathData(): PathData {
@@ -24,9 +23,9 @@ data class PathWrapper(
                     (strokeColor.red * 255).toInt(),
                     (strokeColor.green * 255).toInt(),
                     (strokeColor.blue * 255).toInt(),
+                    (strokeColor.alpha * 255).toInt(),
                 ),
                 actionType = actionType,
-                alpha = alpha
             )
         }
     }

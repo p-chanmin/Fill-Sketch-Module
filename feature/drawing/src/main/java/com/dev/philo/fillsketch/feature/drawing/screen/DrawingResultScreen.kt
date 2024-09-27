@@ -259,7 +259,6 @@ fun DrawingResultContentPreview() {
                         strokeWidth = 40f,
                         strokeColor = Color.Red,
                         actionType = ActionType.BRUSH,
-                        alpha = 1f
                     )
                 )
             ),

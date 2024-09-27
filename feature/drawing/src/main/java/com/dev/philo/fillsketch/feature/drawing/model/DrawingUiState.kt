@@ -11,8 +11,7 @@ data class DrawingUiState(
     val width: Int = 0,
     val height: Int = 0,
     val dpi: Int = 0,
-    val alpha: Float = 0.2f,
     val strokeWidth: Float = 20f,
-    val strokeColor: Color = Color(0f, 0f, 0f),
+    val strokeColor: Color = Color(0f, 0f, 0f, 1f),
     val actionType: ActionType = ActionType.MOVE
 )

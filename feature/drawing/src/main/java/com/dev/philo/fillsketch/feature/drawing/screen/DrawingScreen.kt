@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,8 +45,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
 import com.dev.philo.fillsketch.feature.drawing.viewmodel.DrawingViewModel
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @Composable
 fun DrawingScreen(
@@ -91,7 +96,6 @@ fun DrawingScreen(
         undo = drawingViewModel::undo,
         redo = drawingViewModel::redo,
         reset = drawingViewModel::reset,
-        updateAlpha = drawingViewModel::updateAlpha,
         updateColor = drawingViewModel::updateColor,
         updateStrokeWidth = drawingViewModel::updateStrokeWidth,
         updateActionType = drawingViewModel::updateActionType,
@@ -116,7 +120,6 @@ fun DrawingContent(
     undo: () -> Unit,
     redo: () -> Unit,
     reset: () -> Unit,
-    updateAlpha: (Float) -> Unit,
     updateColor: (Color) -> Unit,
     updateStrokeWidth: (Float) -> Unit,
     updateActionType: (ActionType) -> Unit,
@@ -177,65 +180,81 @@ fun DrawingContent(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-        ) {
-            Row(
-                modifier = Modifier,
-            ) {
-                Button(
-                    onClick = {
-                        val colors = listOf(
-                            Color.Red,
-                            Color.Blue,
-                            Color.Green,
-                            Color.Yellow,
-                            Color.Cyan,
-                            Color.Magenta
-                        )
-                        val color = colors.random()
-                        updateColor(color)
-                        updateActionType(ActionType.BRUSH)
-                    }
-                ) {
-                    Text(text = "Color Change")
-                }
-            }
-            Row {
-                Button(
-                    enabled = drawingUiState.actionType != ActionType.MOVE,
-                    onClick = { updateActionType(ActionType.MOVE) }
-                ) {
-                    Text(text = "Move")
-                }
-                Button(
-                    enabled = drawingUiState.actionType != ActionType.BRUSH,
-                    onClick = {
-                        updateActionType(ActionType.BRUSH)
-                    }
-                ) {
-                    Text(text = "Brush")
-                }
-                Button(
-                    enabled = drawingUiState.actionType != ActionType.ERASER,
-                    onClick = {
-                        updateActionType(ActionType.ERASER)
-                    }
-                ) {
-                    Text(text = "ERASER")
-                }
-                Button(
-                    enabled = drawingUiState.actionType != ActionType.MAGIC_BRUSH,
-                    onClick = {
-                        updateActionType(ActionType.MAGIC_BRUSH)
-                    }
-                ) {
-                    Text(text = "Magic")
-                }
+        val colorPickerController = rememberColorPickerController()
+        LaunchedEffect(Unit) {
+            println("LaunchedEffect start")
+            colorPickerController.selectByColor(drawingUiState.strokeColor, false)
+            colorPickerController.getColorFlow().collectLatest { colorEnvelope ->
+                println(colorEnvelope.color)
             }
         }
+
+        DrawingPalette(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            drawingUiState = drawingUiState,
+            colorPickerController = colorPickerController,
+            updateActionType = updateActionType
+        )
+
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .fillMaxWidth()
+//        ) {
+//            Row(
+//                modifier = Modifier,
+//            ) {
+//                Button(
+//                    onClick = {
+//                        val colors = listOf(
+//                            Color.Red,
+//                            Color.Blue,
+//                            Color.Green,
+//                            Color.Yellow,
+//                            Color.Cyan,
+//                            Color.Magenta
+//                        )
+//                        val color = colors.random()
+//                        updateColor(color)
+//                        updateActionType(ActionType.BRUSH)
+//                    }
+//                ) {
+//                    Text(text = "Color Change")
+//                }
+//            }
+//            Row {
+//                Button(
+//                    enabled = drawingUiState.actionType != ActionType.MOVE,
+//                    onClick = { updateActionType(ActionType.MOVE) }
+//                ) {
+//                    Text(text = "Move")
+//                }
+//                Button(
+//                    enabled = drawingUiState.actionType != ActionType.BRUSH,
+//                    onClick = {
+//                        updateActionType(ActionType.BRUSH)
+//                    }
+//                ) {
+//                    Text(text = "Brush")
+//                }
+//                Button(
+//                    enabled = drawingUiState.actionType != ActionType.ERASER,
+//                    onClick = {
+//                        updateActionType(ActionType.ERASER)
+//                    }
+//                ) {
+//                    Text(text = "ERASER")
+//                }
+//                Button(
+//                    enabled = drawingUiState.actionType != ActionType.MAGIC_BRUSH,
+//                    onClick = {
+//                        updateActionType(ActionType.MAGIC_BRUSH)
+//                    }
+//                ) {
+//                    Text(text = "Magic")
+//                }
+//            }
+//        }
     }
 }
 
@@ -362,7 +381,6 @@ fun DrawingContentPreview() {
             undo = { },
             redo = { },
             reset = { },
-            updateAlpha = { },
             updateColor = { },
             updateStrokeWidth = { },
             updateActionType = { },

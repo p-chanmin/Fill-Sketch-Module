@@ -9,6 +9,7 @@ data class StrokeColor(
     val r: Int,
     val g: Int,
     val b: Int,
+    val alpha: Int
 )
 
 data class PathData(
@@ -16,5 +17,4 @@ data class PathData(
     val strokeWidth: Float = 10f,
     val strokeColor: StrokeColor,
     val actionType: ActionType,
-    val alpha: Float = 1f
 )

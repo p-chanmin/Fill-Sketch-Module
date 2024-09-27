@@ -21,9 +21,8 @@ data class MyWork(
                 PathWrapper(
                     points = pathData.points.map { Offset(it.x, it.y) }.toMutableStateList(),
                     strokeWidth = pathData.strokeWidth,
-                    strokeColor = pathData.strokeColor.let { Color(it.r, it.g, it.b) },
+                    strokeColor = pathData.strokeColor.let { Color(it.r, it.g, it.b, it.alpha) },
                     actionType = pathData.actionType,
-                    alpha = pathData.alpha
                 )
             }.toMutableStateList()
         )

@@ -114,14 +114,15 @@ fun FillSketchSettingButton(
     ) {
         Row(
             modifier = Modifier
-                .padding(Paddings.large)
-                .fillMaxSize()
-                .clickable { onClick() },
+                .clickable { onClick() }
+                .fillMaxSize(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             painter?.let {
                 Image(
+                    modifier = Modifier
+                        .padding(Paddings.large),
                     painter = painter,
                     contentDescription = contentDescription,
                     contentScale = ContentScale.Fit

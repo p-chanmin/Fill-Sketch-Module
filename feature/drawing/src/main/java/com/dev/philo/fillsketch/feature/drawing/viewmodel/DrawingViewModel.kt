@@ -69,8 +69,8 @@ class DrawingViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val myWork = MyWork.create(
-                    drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
-                )
+                drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
+            )
             currentMaskBitmap.value = myWork.latestBitmap
             liveDrawingMaskBitmap.value =
                 getEmptyBitmapBySize(width, height, dpi, whiteBackground = false)
@@ -170,16 +170,20 @@ class DrawingViewModel @Inject constructor(
     }
 
     fun drawOnNewMask(newMask: Boolean = false) {
-        val maskBitmap = if (newMask) {
-            getEmptyBitmapBySize(
-                _drawingUiState.value.width,
-                _drawingUiState.value.height,
-                _drawingUiState.value.dpi,
-                true
-            )
-        } else {
-            _drawingUiState.value.latestBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        if (newMask) {
+            _drawingUiState.update {
+                it.copy(
+                    latestBitmap = getEmptyBitmapBySize(
+                        _drawingUiState.value.width,
+                        _drawingUiState.value.height,
+                        _drawingUiState.value.dpi,
+                        true
+                    )
+                )
+            }
         }
+
+        val maskBitmap = _drawingUiState.value.latestBitmap.copy(Bitmap.Config.ARGB_8888, true)
 
         val canvas = Canvas(maskBitmap)
 

@@ -1,7 +1,5 @@
 package com.dev.philo.fillsketch.feature.drawing.navigation
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -27,10 +25,7 @@ fun NavGraphBuilder.drawingNavGraph(
     navigateToDrawingResult: (Int, Int) -> Unit,
     navigateToMyWorks: () -> Unit
 ) {
-    composable<Route.Drawing>(
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() }
-    ) { navBackStackEntry ->
+    composable<Route.Drawing> { navBackStackEntry ->
         val (sketchType, drawingResultId) = navBackStackEntry.toRoute<Route.Drawing>()
         DrawingScreen(
             paddingValues = paddingValues,
@@ -42,10 +37,7 @@ fun NavGraphBuilder.drawingNavGraph(
         )
     }
 
-    composable<Route.DrawingResult>(
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() }
-    ) { navBackStackEntry ->
+    composable<Route.DrawingResult> { navBackStackEntry ->
         val (sketchType, drawingResultId) = navBackStackEntry.toRoute<Route.Drawing>()
         DrawingResultScreen(
             paddingValues = paddingValues,

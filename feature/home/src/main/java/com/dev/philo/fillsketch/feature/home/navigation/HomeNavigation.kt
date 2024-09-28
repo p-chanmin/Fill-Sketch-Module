@@ -1,7 +1,5 @@
 package com.dev.philo.fillsketch.feature.home.navigation
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -28,22 +26,17 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToDrawing: (Int, Int) -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit
 ) {
-    composable<Route.Home>(
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() }
-    ) {
+    composable<Route.Home> {
         HomeScreen(
             paddingValues = paddingValues,
+            playButtonSound = playButtonSound,
             onShowErrorSnackBar = onShowErrorSnackBar,
             navigateToSketchList = navigateToSketchList,
             navigateToMyWorks = navigateToMyWorks
         )
     }
 
-    composable<Route.SketchList>(
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() }
-    ) {
+    composable<Route.SketchList> {
         SketchListScreen(
             paddingValues = paddingValues,
             onShowErrorSnackBar = onShowErrorSnackBar,
@@ -52,10 +45,7 @@ fun NavGraphBuilder.homeNavGraph(
         )
     }
 
-    composable<Route.MyWorks>(
-        enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() }
-    ) {
+    composable<Route.MyWorks> {
         MyWorksScreen(
             paddingValues = paddingValues,
             onShowErrorSnackBar = onShowErrorSnackBar,

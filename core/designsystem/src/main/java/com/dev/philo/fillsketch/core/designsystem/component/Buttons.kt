@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.asset.R as AssetR
 
 @Composable
@@ -39,6 +40,7 @@ fun FillSketchMainButton(
     badge: Painter? = null,
     badgeDescription: String? = null,
     text: String = "",
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onClick: () -> Unit
 ) {
     Surface(
@@ -50,8 +52,12 @@ fun FillSketchMainButton(
         shadowElevation = 2.dp,
     ) {
         Box(
-            modifier = Modifier.fillMaxSize()
-                .clickable { onClick() }
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                    playSoundEffect(SoundEffect.BUTTON_CLICK)
+                    onClick()
+                }
         ) {
             Image(
                 modifier = Modifier
@@ -99,6 +105,7 @@ fun FillSketchSettingButton(
     contentDescription: String? = null,
     color: Color = MaterialTheme.colorScheme.onSurface,
     text: String? = null,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onClick: () -> Unit
 ) {
     Surface(
@@ -114,7 +121,10 @@ fun FillSketchSettingButton(
     ) {
         Row(
             modifier = Modifier
-                .clickable { onClick() }
+                .clickable {
+                    playSoundEffect(SoundEffect.BUTTON_CLICK)
+                    onClick()
+                }
                 .fillMaxSize(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically

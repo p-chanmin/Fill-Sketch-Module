@@ -25,11 +25,13 @@ import androidx.compose.ui.window.Dialog
 import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.SoundEffect
 
 @Composable
 fun FillSketchDialog(
     titleText: String = "",
     onDismissRequest: () -> Unit = {},
+    playSoundEffect: (SoundEffect) -> Unit = {},
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     Dialog(
@@ -77,7 +79,8 @@ fun FillSketchDialog(
                         FillSketchSettingButton(
                             modifier = Modifier.size(40.dp),
                             painter = painterResource(id = R.drawable.ic_close),
-                            onClick = { onDismissRequest() }
+                            onClick = { onDismissRequest() },
+                            playSoundEffect = playSoundEffect,
                         )
                     }
 

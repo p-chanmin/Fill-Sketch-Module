@@ -65,6 +65,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
 import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
@@ -80,6 +81,7 @@ fun DrawingUiButton(
     painter: Painter,
     enabled: Boolean = true,
     contentDescription: String? = null,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onClick: () -> Unit = {}
 ) {
 
@@ -96,7 +98,10 @@ fun DrawingUiButton(
             disabledContainerColor = MaterialTheme.colorScheme.scrim
         ),
         enabled = enabled,
-        onClick = { onClick() }
+        onClick = {
+            playSoundEffect(SoundEffect.BUTTON_CLICK)
+            onClick()
+        }
     ) {
         Image(
             modifier = Modifier.padding(6.dp),
@@ -117,8 +122,8 @@ fun DrawingPalette(
     updateActionType: (ActionType) -> Unit,
     updateStrokeWidth: (Float) -> Unit,
     updateMagicBrushState: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
-
     var currentPreColorIndex by remember { mutableIntStateOf(0) }
 
     Row(
@@ -132,6 +137,7 @@ fun DrawingPalette(
                 .padding(end = Paddings.medium)
                 .size(30.dp),
             painter = painterResource(id = DesignSystemR.drawable.ic_left),
+            playSoundEffect = playSoundEffect,
             onClick = {
                 if (currentPreColorIndex == 0) {
                     currentPreColorIndex = presetColorList.size - 1
@@ -194,7 +200,10 @@ fun DrawingPalette(
                                     Box(
                                         modifier = Modifier
                                             .size(25.dp)
-                                            .clickable { openColorPickerDialog() }
+                                            .clickable {
+                                                playSoundEffect(SoundEffect.BUTTON_CLICK)
+                                                openColorPickerDialog()
+                                            }
                                             .background(Color.White.copy(alpha = 0.3f))
                                     )
                                 }
@@ -267,6 +276,7 @@ fun DrawingPalette(
                                                         }
                                                     }
                                                     .clickable {
+                                                        playSoundEffect(SoundEffect.BUTTON_CLICK)
                                                         colorPickerController.selectByColor(
                                                             presetColorList[currentPreColorIndex][j],
                                                             true
@@ -352,7 +362,10 @@ fun DrawingPalette(
                     modifier = Modifier
                         .size(30.dp)
                         .offset { IntOffset(0, offsetMoveY.roundToPx()) }
-                        .clickable { updateActionType(ActionType.MOVE) },
+                        .clickable {
+                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                            updateActionType(ActionType.MOVE)
+                        },
                     painter = painterResource(id = DesignSystemR.drawable.ic_hand),
                     contentDescription = null
                 )
@@ -364,7 +377,10 @@ fun DrawingPalette(
                     modifier = Modifier
                         .size(30.dp)
                         .offset { IntOffset(0, offsetBrushY.roundToPx()) }
-                        .clickable { updateActionType(ActionType.BRUSH) },
+                        .clickable {
+                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                            updateActionType(ActionType.BRUSH)
+                        },
                     painter = painterResource(id = DesignSystemR.drawable.ic_brush),
                     contentDescription = null
                 )
@@ -376,7 +392,10 @@ fun DrawingPalette(
                     modifier = Modifier
                         .size(30.dp)
                         .offset { IntOffset(0, offsetEraserY.roundToPx()) }
-                        .clickable { updateActionType(ActionType.ERASER) },
+                        .clickable {
+                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                            updateActionType(ActionType.ERASER)
+                        },
                     painter = painterResource(id = DesignSystemR.drawable.ic_erase),
                     contentDescription = null
                 )
@@ -389,6 +408,7 @@ fun DrawingPalette(
                         .size(30.dp)
                         .offset { IntOffset(0, offsetMagicBrushY.roundToPx()) }
                         .clickable {
+                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
                             if (drawingUiState.hasMagicBrush) {
                                 updateActionType(ActionType.MAGIC_BRUSH)
                             } else {
@@ -420,6 +440,7 @@ fun DrawingPalette(
                 .padding(start = Paddings.medium)
                 .size(30.dp),
             painter = painterResource(id = DesignSystemR.drawable.ic_right),
+            playSoundEffect = playSoundEffect,
             onClick = {
                 if (currentPreColorIndex == presetColorList.size - 1) {
                     currentPreColorIndex = 0
@@ -438,9 +459,11 @@ fun ColorPickerDialog(
     sketchType: Int,
     currentMaskBitmap: Bitmap,
     initialColor: Color,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     FillSketchDialog(
         titleText = "Color Palette",
+        playSoundEffect = playSoundEffect,
         onDismissRequest = {
             onDismiss()
         }
@@ -535,7 +558,10 @@ fun ColorPickerDialog(
                         .padding(10.dp)
                         .size(35.dp)
                         .align(Alignment.BottomStart)
-                        .clickable { dropperMode = false },
+                        .clickable {
+                            playSoundEffect(SoundEffect.BUTTON_CLICK)
+                            dropperMode = false
+                        },
                     painter = painterResource(id = DesignSystemR.drawable.ic_colorpicker),
                     contentDescription = null
                 )
@@ -545,7 +571,10 @@ fun ColorPickerDialog(
                         .padding(10.dp)
                         .size(35.dp)
                         .align(Alignment.BottomStart)
-                        .clickable { dropperMode = true },
+                        .clickable {
+                            playSoundEffect(SoundEffect.BUTTON_CLICK)
+                            dropperMode = true
+                        },
                     painter = painterResource(id = DesignSystemR.drawable.ic_dropper),
                     contentDescription = null
                 )

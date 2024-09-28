@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.asset.R as AssetR
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
@@ -31,6 +32,7 @@ fun FillSketchCard(
     imageBitmap: ImageBitmap,
     imageBitmapDescription: String? = null,
     isLock: Boolean = false,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onClick: () -> Unit
 ) {
     Surface(
@@ -41,7 +43,10 @@ fun FillSketchCard(
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(5.dp)
-            .clickable { onClick() },
+            .clickable {
+                playSoundEffect(SoundEffect.BUTTON_CLICK)
+                onClick()
+            },
         color = MaterialTheme.colorScheme.primary,
         shadowElevation = 2.dp,
     ) {

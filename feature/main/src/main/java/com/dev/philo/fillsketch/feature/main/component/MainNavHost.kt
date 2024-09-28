@@ -5,6 +5,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.navigation.drawingNavGraph
 import com.dev.philo.fillsketch.feature.home.navigation.homeNavGraph
 import com.dev.philo.fillsketch.feature.main.MainNavigator
@@ -13,6 +14,7 @@ import com.dev.philo.fillsketch.feature.main.MainNavigator
 internal fun MainNavHost(
     navigator: MainNavigator,
     padding: PaddingValues,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onShowErrorSnackBar: (String) -> Unit,
 ) {
     NavHost(
@@ -23,6 +25,7 @@ internal fun MainNavHost(
     ) {
         homeNavGraph(
             paddingValues = padding,
+            playSoundEffect = playSoundEffect,
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = { navigator.popBackStackIfNotHome() },
             navigateToSketchList = { navigator.navigateToSketchList() },
@@ -43,6 +46,7 @@ internal fun MainNavHost(
 
         drawingNavGraph(
             paddingValues = padding,
+            playSoundEffect = playSoundEffect,
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = { navigator.popBackStackIfNotHome() },
             navigateToDrawing = { sketchType, drawingResultId ->

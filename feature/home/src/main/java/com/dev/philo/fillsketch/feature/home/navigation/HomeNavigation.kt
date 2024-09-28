@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.core.navigation.Route
 import com.dev.philo.fillsketch.feature.home.screen.HomeScreen
 import com.dev.philo.fillsketch.feature.home.screen.MyWorksScreen
@@ -19,6 +20,7 @@ fun NavController.navigateToMyWorks() {
 
 fun NavGraphBuilder.homeNavGraph(
     paddingValues: PaddingValues,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onShowErrorSnackBar: (String) -> Unit,
     onBackClick: () -> Unit,
     navigateToSketchList: () -> Unit,
@@ -29,10 +31,10 @@ fun NavGraphBuilder.homeNavGraph(
     composable<Route.Home> {
         HomeScreen(
             paddingValues = paddingValues,
-            playButtonSound = playButtonSound,
             onShowErrorSnackBar = onShowErrorSnackBar,
             navigateToSketchList = navigateToSketchList,
-            navigateToMyWorks = navigateToMyWorks
+            navigateToMyWorks = navigateToMyWorks,
+            playSoundEffect = playSoundEffect,
         )
     }
 
@@ -42,6 +44,7 @@ fun NavGraphBuilder.homeNavGraph(
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = onBackClick,
             navigateToDrawing = navigateToDrawing,
+            playSoundEffect = playSoundEffect,
         )
     }
 
@@ -50,7 +53,8 @@ fun NavGraphBuilder.homeNavGraph(
             paddingValues = paddingValues,
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = onBackClick,
-            navigateToDrawingResult = navigateToDrawingResult
+            navigateToDrawingResult = navigateToDrawingResult,
+            playSoundEffect = playSoundEffect,
         )
     }
 }

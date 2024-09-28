@@ -21,14 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -44,16 +41,14 @@ import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
-import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
-import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
 import com.dev.philo.fillsketch.feature.home.model.MyWork
 import com.dev.philo.fillsketch.feature.home.model.MyWorksUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.MyWorksViewModel
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
 @Composable
@@ -62,6 +57,7 @@ fun MyWorksScreen(
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     myWorksViewModel: MyWorksViewModel = hiltViewModel()
 ) {
     val myWorksUiState by myWorksViewModel.myWorksUiState.collectAsStateWithLifecycle()
@@ -70,7 +66,8 @@ fun MyWorksScreen(
         myWorksUiState = myWorksUiState,
         onBackClick = onBackClick,
         navigateToDrawingResult = navigateToDrawingResult,
-        deleteMyWork = myWorksViewModel::deleteMyWork
+        deleteMyWork = myWorksViewModel::deleteMyWork,
+        playSoundEffect = playSoundEffect,
     )
 }
 
@@ -80,6 +77,7 @@ fun MyWorksContent(
     onBackClick: () -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit,
     deleteMyWork: (Int) -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     val lazyGridState = rememberLazyGridState()
 
@@ -96,8 +94,8 @@ fun MyWorksContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FillSketchSettingButton(
-                modifier = Modifier
-                    .size(60.dp),
+                modifier = Modifier.size(60.dp),
+                playSoundEffect = playSoundEffect,
                 painter = painterResource(id = DesignSystemR.drawable.ic_left),
                 onClick = { onBackClick() }
             )
@@ -139,13 +137,15 @@ fun MyWorksContent(
                     MyWorkImage(
                         sketchType = it.sketchType,
                         latestBitmap = it.latestBitmap,
+                        playSoundEffect = playSoundEffect,
                         onClick = { navigateToDrawingResult(it.sketchType, it.id) },
                         onDeleteClick = { deleteDialog = true },
                     )
 
                     if (deleteDialog) {
                         FillSketchDialog(
-                            onDismissRequest = { deleteDialog = false }
+                            onDismissRequest = { deleteDialog = false },
+                            playSoundEffect = playSoundEffect,
                         ) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
@@ -173,6 +173,7 @@ fun MyWorksContent(
                                         .padding(top = Paddings.xextra)
                                         .height(60.dp)
                                         .width(200.dp),
+                                    playSoundEffect = playSoundEffect,
                                     painter = painterResource(id = DesignSystemR.drawable.ic_trash),
                                     text = "delete",
                                     onClick = {
@@ -205,7 +206,7 @@ fun MyWorksContentPreview() {
                     ),
                     MyWork(
                         id = 1,
-                        sketchType = 9,
+                        sketchType = 1,
                         latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[1])
                             .asAndroidBitmap()
                     )

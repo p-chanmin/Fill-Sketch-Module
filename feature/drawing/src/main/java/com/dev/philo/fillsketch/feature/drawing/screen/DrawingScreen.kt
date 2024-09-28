@@ -58,6 +58,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.component.ColorPickerDialog
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingUiButton
@@ -75,6 +76,7 @@ fun DrawingScreen(
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     drawingViewModel: DrawingViewModel = hiltViewModel()
 ) {
 
@@ -118,6 +120,7 @@ fun DrawingScreen(
         updateMagicBrushState = drawingViewModel::updateMagicBrushState,
         onBackClick = onBackClick,
         navigateToDrawingResult = { navigateToDrawingResult(sketchType, drawingResultId) },
+        playSoundEffect = playSoundEffect,
     )
 }
 
@@ -143,6 +146,7 @@ fun DrawingContent(
     updateMagicBrushState: () -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawingResult: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -170,6 +174,7 @@ fun DrawingContent(
             insertNewPath = insertNewPath,
             updateLatestPath = updateLatestPath,
             drawOnNewMask = drawOnNewMask,
+            playSoundEffect = playSoundEffect,
         )
 
         Row(
@@ -180,6 +185,7 @@ fun DrawingContent(
         ) {
             DrawingUiButton(
                 modifier = Modifier.size(30.dp),
+                playSoundEffect = playSoundEffect,
                 painter = painterResource(id = DesignSystemR.drawable.ic_left),
                 onClick = { onBackClick() }
             )
@@ -191,6 +197,7 @@ fun DrawingContent(
                     modifier = Modifier
                         .height(30.dp)
                         .width(60.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_undo),
                     enabled = undoPathSize != 0,
                     onClick = { undo() }
@@ -199,6 +206,7 @@ fun DrawingContent(
                     modifier = Modifier
                         .height(30.dp)
                         .width(60.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_redo),
                     enabled = redoPathSize != 0,
                     onClick = { redo() }
@@ -207,6 +215,7 @@ fun DrawingContent(
                     modifier = Modifier
                         .height(30.dp)
                         .width(60.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_trash),
                     onClick = { resetDialogVisible = true }
                 )
@@ -214,6 +223,7 @@ fun DrawingContent(
                     modifier = Modifier
                         .height(30.dp)
                         .width(60.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_complete),
                     onClick = { navigateToDrawingResult() }
                 )
@@ -233,6 +243,7 @@ fun DrawingContent(
         if (colorPaletteDialog) {
             ColorPickerDialog(
                 onDismiss = { colorPaletteDialog = false },
+                playSoundEffect = playSoundEffect,
                 colorPickerController = colorPickerController,
                 sketchType = drawingUiState.sketchType,
                 currentMaskBitmap = currentMaskBitmap,
@@ -257,6 +268,7 @@ fun DrawingContent(
                 ) {
                     DrawingUiButton(
                         modifier = Modifier.size(30.dp),
+                        playSoundEffect = playSoundEffect,
                         painter = if (paletteVisible) {
                             painterResource(id = DesignSystemR.drawable.ic_hide_down)
                         } else {
@@ -268,6 +280,7 @@ fun DrawingContent(
                     )
                     DrawingUiButton(
                         modifier = Modifier.size(30.dp),
+                        playSoundEffect = playSoundEffect,
                         painter = painterResource(id = DesignSystemR.drawable.ic_screen),
                         onClick = {
                             offset = Offset.Zero
@@ -284,6 +297,7 @@ fun DrawingContent(
             ) {
                 DrawingPalette(
                     drawingUiState = drawingUiState,
+                    playSoundEffect = playSoundEffect,
                     colorPickerController = colorPickerController,
                     openColorPickerDialog = { colorPaletteDialog = true },
                     updateActionType = updateActionType,
@@ -295,7 +309,8 @@ fun DrawingContent(
 
         if (resetDialogVisible) {
             FillSketchDialog(
-                onDismissRequest = { resetDialogVisible = false }
+                onDismissRequest = { resetDialogVisible = false },
+                playSoundEffect = playSoundEffect,
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -323,6 +338,7 @@ fun DrawingContent(
                             .padding(top = Paddings.xextra)
                             .height(60.dp)
                             .width(200.dp),
+                        playSoundEffect = playSoundEffect,
                         painter = painterResource(id = DesignSystemR.drawable.ic_trash),
                         text = "reset",
                         onClick = {
@@ -349,7 +365,8 @@ fun DrawingCanvas(
     liveDrawingMaskBitmap: Bitmap,
     insertNewPath: (Offset) -> Unit,
     updateLatestPath: (Offset) -> Unit,
-    drawOnNewMask: () -> Unit
+    drawOnNewMask: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -394,6 +411,7 @@ fun DrawingCanvas(
                                         drawingUiState.width * start.position.x / canvasSize.width,
                                         drawingUiState.height * start.position.y / canvasSize.height
                                     )
+                                    playSoundEffect(SoundEffect.DRAWING)
                                     insertNewPath(startOffset)
                                     updateLatestPath(startOffset)
 
@@ -403,6 +421,7 @@ fun DrawingCanvas(
                                             drawingUiState.height * change.position.y / canvasSize.height
                                         )
                                         change.consume()
+                                        playSoundEffect(SoundEffect.DRAWING)
                                         updateLatestPath(calculatedOffset)
                                     }
                                     drawOnNewMask()
@@ -426,7 +445,6 @@ fun DrawingCanvas(
                 contentDescription = null
             )
         }
-
     }
 }
 

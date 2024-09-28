@@ -5,6 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.core.navigation.Route
 import com.dev.philo.fillsketch.feature.drawing.screen.DrawingResultScreen
 import com.dev.philo.fillsketch.feature.drawing.screen.DrawingScreen
@@ -19,6 +20,7 @@ fun NavController.navigateToDrawingResult(sketchType: Int, drawingResultId: Int)
 
 fun NavGraphBuilder.drawingNavGraph(
     paddingValues: PaddingValues,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     onShowErrorSnackBar: (String) -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
@@ -33,7 +35,8 @@ fun NavGraphBuilder.drawingNavGraph(
             drawingResultId = drawingResultId,
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = onBackClick,
-            navigateToDrawingResult = navigateToDrawingResult
+            navigateToDrawingResult = navigateToDrawingResult,
+            playSoundEffect = playSoundEffect,
         )
     }
 
@@ -46,7 +49,8 @@ fun NavGraphBuilder.drawingNavGraph(
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = onBackClick,
             navigateToDrawing = navigateToDrawing,
-            navigateToMyWorks = navigateToMyWorks
+            navigateToMyWorks = navigateToMyWorks,
+            playSoundEffect = playSoundEffect,
         )
     }
 }

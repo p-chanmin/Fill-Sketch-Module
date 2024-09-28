@@ -21,12 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -42,15 +39,13 @@ import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
-import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
-import com.dev.philo.fillsketch.core.model.ActionType
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.R
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingResultImage
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingResultUiState
 import com.dev.philo.fillsketch.feature.drawing.viewmodel.DrawingResultViewModel
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
@@ -63,6 +58,7 @@ fun DrawingResultScreen(
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
     navigateToMyWorks: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     drawingResultViewModel: DrawingResultViewModel = hiltViewModel()
 ) {
 
@@ -87,6 +83,7 @@ fun DrawingResultScreen(
         dismissSaveCompleteDialog = { drawingResultViewModel.updateSaveCompleteDialogVisible(false) },
         navigateToMyWorks = navigateToMyWorks,
         onBackClick = onBackClick,
+        playSoundEffect = playSoundEffect,
         saveDrawingResult = {
             coroutineScope.launch {
                 val resultBitmap =
@@ -138,6 +135,7 @@ fun DrawingResultContent(
     onBackClick: () -> Unit,
     saveDrawingResult: () -> Unit,
     navigateToMyWorks: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -180,6 +178,7 @@ fun DrawingResultContent(
                     modifier = Modifier
                         .height(60.dp)
                         .width(60.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_edit),
                     onClick = { navigateToDrawing() }
                 )
@@ -188,6 +187,7 @@ fun DrawingResultContent(
                         .padding(start = 32.dp)
                         .height(60.dp)
                         .width(200.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = DesignSystemR.drawable.ic_download),
                     onClick = { saveDrawingResult() }
                 )
@@ -198,6 +198,7 @@ fun DrawingResultContent(
             modifier = Modifier
                 .padding(top = Paddings.xlarge, start = Paddings.large)
                 .size(60.dp),
+            playSoundEffect = playSoundEffect,
             painter = painterResource(id = DesignSystemR.drawable.ic_left),
             onClick = { onBackClick() }
         )
@@ -205,7 +206,8 @@ fun DrawingResultContent(
 
     if (drawingResultUiState.saveCompleteDialogVisible) {
         FillSketchDialog(
-            onDismissRequest = { dismissSaveCompleteDialog() }
+            onDismissRequest = { dismissSaveCompleteDialog() },
+            playSoundEffect = playSoundEffect,
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -230,6 +232,7 @@ fun DrawingResultContent(
                         .padding(top = Paddings.xextra)
                         .height(60.dp)
                         .fillMaxWidth(),
+                    playSoundEffect = playSoundEffect,
                     text = "Move To MyWorks",
                     onClick = {
                         navigateToMyWorks()
@@ -250,7 +253,8 @@ fun DrawingResultContentPreview() {
             sketchType = 0,
             drawingResultUiState = DrawingResultUiState(
                 saveCompleteDialogVisible = false,
-                latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0]).asAndroidBitmap()
+                latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                    .asAndroidBitmap()
             ),
             navigateToDrawing = {},
             dismissSaveCompleteDialog = {},

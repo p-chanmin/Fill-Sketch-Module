@@ -2,7 +2,6 @@ package com.dev.philo.fillsketch.feature.home.component
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,15 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -32,12 +24,9 @@ import androidx.compose.ui.unit.dp
 import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
-import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
-import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
-import com.dev.philo.fillsketch.core.model.ActionType
-import kotlinx.collections.immutable.persistentListOf
+import com.dev.philo.fillsketch.core.model.SoundEffect
 
 @Composable
 fun MyWorkImage(
@@ -45,7 +34,8 @@ fun MyWorkImage(
     sketchType: Int,
     latestBitmap: Bitmap,
     onClick: () -> Unit,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
 
     val recommendImageBitmap =
@@ -62,7 +52,10 @@ fun MyWorkImage(
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(5.dp)
-            .clickable { onClick() },
+            .clickable {
+                playSoundEffect(SoundEffect.BUTTON_CLICK)
+                onClick()
+            },
         color = MaterialTheme.colorScheme.primary,
         shadowElevation = 2.dp,
     ) {
@@ -89,7 +82,8 @@ fun MyWorkImage(
                     .size(40.dp),
                 painter = painterResource(id = R.drawable.ic_trash),
                 color = MaterialTheme.colorScheme.primary,
-                onClick = { onDeleteClick() }
+                onClick = { onDeleteClick() },
+                playSoundEffect = playSoundEffect,
             )
         }
     }

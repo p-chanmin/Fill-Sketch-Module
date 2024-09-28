@@ -40,6 +40,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingBut
 import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.home.model.HomeUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.HomeViewModel
 import kotlin.math.roundToInt
@@ -52,6 +53,7 @@ fun HomeScreen(
     onShowErrorSnackBar: (message: String) -> Unit,
     navigateToSketchList: () -> Unit,
     navigateToMyWorks: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -63,6 +65,7 @@ fun HomeScreen(
         navigateToMyWorks = navigateToMyWorks,
         updateSoundEffectSetting = homeViewModel::updateSoundEffectSetting,
         updateBackgroundMusicSetting = homeViewModel::updateBackgroundMusicSetting,
+        playSoundEffect = playSoundEffect,
     )
 }
 
@@ -73,6 +76,7 @@ fun HomeContent(
     navigateToMyWorks: () -> Unit,
     updateSoundEffectSetting: () -> Unit,
     updateBackgroundMusicSetting: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     Box(
         modifier = Modifier
@@ -106,6 +110,7 @@ fun HomeContent(
 
             FillSketchSettingButton(
                 modifier = Modifier.size(60.dp),
+                playSoundEffect = playSoundEffect,
                 painter = if (homeUiState.setting.backgroundMusic) {
                     painterResource(id = DesignSystemR.drawable.ic_bgm_on)
                 } else {
@@ -116,6 +121,7 @@ fun HomeContent(
 
             FillSketchSettingButton(
                 modifier = Modifier.size(60.dp),
+                playSoundEffect = playSoundEffect,
                 painter = painterResource(id = DesignSystemR.drawable.ic_setting),
                 onClick = {}
             )
@@ -203,6 +209,7 @@ fun HomeContent(
             ) {
                 FillSketchMainButton(
                     modifier = Modifier.size(100.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = AssetR.drawable.img_sketch),
                     badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
                     onClick = {}
@@ -210,6 +217,7 @@ fun HomeContent(
 
                 FillSketchMainButton(
                     modifier = Modifier.size(100.dp),
+                    playSoundEffect = playSoundEffect,
                     painter = painterResource(id = AssetR.drawable.img_sketch),
                     badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
                     onClick = {}
@@ -224,6 +232,7 @@ fun HomeContent(
             ) {
                 FillSketchMainButton(
                     modifier = Modifier.size(150.dp),
+                    playSoundEffect = playSoundEffect,
                     text = "Sketch",
                     painter = painterResource(id = AssetR.drawable.img_sketch),
                     onClick = { navigateToSketchList() }
@@ -233,6 +242,7 @@ fun HomeContent(
 
                 FillSketchMainButton(
                     modifier = Modifier.size(150.dp),
+                    playSoundEffect = playSoundEffect,
                     text = "MyWorks",
                     painter = painterResource(id = AssetR.drawable.img_myworks),
                     onClick = { navigateToMyWorks() }

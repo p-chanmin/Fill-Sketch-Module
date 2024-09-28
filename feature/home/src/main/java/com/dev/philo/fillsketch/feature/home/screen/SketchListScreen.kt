@@ -50,6 +50,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.Sketch
+import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
 import com.dev.philo.fillsketch.feature.home.model.MyWork
 import com.dev.philo.fillsketch.feature.home.model.SketchListUiEvent
@@ -65,6 +66,7 @@ fun SketchListScreen(
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
     sketchListViewModel: SketchListViewModel = hiltViewModel()
 ) {
 
@@ -89,7 +91,8 @@ fun SketchListScreen(
         unlockSketch = sketchListViewModel::unlockSketch,
         addMyWork = sketchListViewModel::addMyWork,
         deleteMyWork = sketchListViewModel::deleteMyWork,
-        dismissDialog = sketchListViewModel::dismissDialog
+        dismissDialog = sketchListViewModel::dismissDialog,
+        playSoundEffect = playSoundEffect,
     )
 
 }
@@ -104,7 +107,8 @@ fun SketchListContent(
     unlockSketch: (Int) -> Unit,
     addMyWork: (Int, Int, Int, Int) -> Unit,
     deleteMyWork: (Int, Int) -> Unit,
-    dismissDialog: () -> Unit
+    dismissDialog: () -> Unit,
+    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
 
     val lazyGridState = rememberLazyGridState()
@@ -122,8 +126,8 @@ fun SketchListContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FillSketchSettingButton(
-                modifier = Modifier
-                    .size(60.dp),
+                modifier = Modifier.size(60.dp),
+                playSoundEffect = playSoundEffect,
                 painter = painterResource(id = DesignSystemR.drawable.ic_left),
                 onClick = { onBackClick() }
             )
@@ -163,7 +167,8 @@ fun SketchListContent(
                         ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[it.sketchType])
                     FillSketchCard(
                         imageBitmap = imageBitmap,
-                        isLock = it.isLocked
+                        isLock = it.isLocked,
+                        playSoundEffect = playSoundEffect,
                     ) {
                         selectSketch(
                             it.sketchType,
@@ -180,7 +185,8 @@ fun SketchListContent(
         if (sketchListUiState.dialogMyWorksVisible && sketchListUiState.selectedSketchId != null) {
             FillSketchDialog(
                 titleText = "Select Work !",
-                onDismissRequest = { dismissDialog() }
+                onDismissRequest = { dismissDialog() },
+                playSoundEffect = playSoundEffect,
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
@@ -195,6 +201,7 @@ fun SketchListContent(
                                 .padding(top = Paddings.large)
                                 .height(60.dp)
                                 .fillMaxWidth(),
+                            playSoundEffect = playSoundEffect,
                             painter = painterResource(id = R.drawable.ic_plus),
                             color = MaterialTheme.colorScheme.onPrimary,
                             onClick = {
@@ -215,6 +222,7 @@ fun SketchListContent(
                         MyWorkImage(
                             sketchType = it.sketchType,
                             latestBitmap = it.latestBitmap,
+                            playSoundEffect = playSoundEffect,
                             onClick = {
                                 dismissDialog()
                                 navigateToDrawing(it.sketchType, it.id)
@@ -224,7 +232,8 @@ fun SketchListContent(
 
                         if (deleteDialog) {
                             FillSketchDialog(
-                                onDismissRequest = { deleteDialog = false }
+                                onDismissRequest = { deleteDialog = false },
+                                playSoundEffect = playSoundEffect,
                             ) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
@@ -252,6 +261,7 @@ fun SketchListContent(
                                             .padding(top = Paddings.xextra)
                                             .height(60.dp)
                                             .width(200.dp),
+                                        playSoundEffect = playSoundEffect,
                                         painter = painterResource(id = DesignSystemR.drawable.ic_trash),
                                         text = "delete",
                                         onClick = {
@@ -268,7 +278,8 @@ fun SketchListContent(
 
         if (sketchListUiState.dialogUnlockVisible && sketchListUiState.selectedSketchId != null) {
             FillSketchDialog(
-                onDismissRequest = { dismissDialog() }
+                onDismissRequest = { dismissDialog() },
+                playSoundEffect = playSoundEffect,
             ) {
                 val scrollState = rememberScrollState()
                 Column(
@@ -287,6 +298,7 @@ fun SketchListContent(
                             .padding(top = Paddings.large)
                             .height(60.dp)
                             .fillMaxWidth(),
+                        playSoundEffect = playSoundEffect,
                         painter = painterResource(id = R.drawable.ic_ads),
                         text = "Watch Ad",
                         onClick = {

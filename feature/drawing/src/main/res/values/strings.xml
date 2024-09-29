@@ -1,3 +1,9 @@
 <resources>
     <string name="feature_drawing_save_title">Fill_sketch</string>
+    <string name="feature_drawing_reset_description">Once you reset, you cannot revert.\nDo you want to reset?</string>
+    <string name="feature_drawing_reset">reset</string>
+    <string name="feature_drawing_download_your_drawing">Download Your Drawing !</string>
+    <string name="feature_drawing_download_complete">Download Complete !</string>
+    <string name="feature_drawing_move_to_myworks">Move To MyWorks</string>
+    <string name="feature_drawing_color_palette">Color Palette</string>
 </resources>

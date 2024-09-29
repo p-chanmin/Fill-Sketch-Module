@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,7 @@ import com.dev.philo.fillsketch.feature.drawing.component.DrawingResultImage
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingResultUiState
 import com.dev.philo.fillsketch.feature.drawing.viewmodel.DrawingResultViewModel
 import kotlinx.coroutines.launch
+import com.dev.philo.fillsketch.asset.R as AssetR
 import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 
 @Composable
@@ -94,14 +96,14 @@ fun DrawingResultScreen(
 
                 val timeStamp = System.currentTimeMillis()
                 val imageFileName =
-                    "${context.getString(R.string.feature_drawing_save_title)}_$timeStamp.jpg"
+                    "${context.getString(AssetR.string.asset_title)}_$timeStamp.jpg"
 
                 val contentValues = ContentValues().apply {
                     put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName)
                     put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
                     put(
                         MediaStore.Images.Media.RELATIVE_PATH,
-                        "Pictures/${context.getString(com.dev.philo.fillsketch.feature.drawing.R.string.feature_drawing_save_title)}"
+                        "Pictures/${context.getString(AssetR.string.asset_title)}"
                     )
                 }
 
@@ -156,7 +158,7 @@ fun DrawingResultContent(
             ) {
                 OutlinedText(
                     textModifier = Modifier,
-                    text = "Download Your Drawing !",
+                    text = stringResource(R.string.feature_drawing_download_your_drawing),
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                     ),
@@ -222,7 +224,7 @@ fun DrawingResultContent(
                     textModifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = Paddings.xextra),
-                    text = "Download Complete !",
+                    text = stringResource(R.string.feature_drawing_download_complete),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                     ),
@@ -239,7 +241,7 @@ fun DrawingResultContent(
                         .height(60.dp)
                         .fillMaxWidth(),
                     playSoundEffect = playSoundEffect,
-                    text = "Move To MyWorks",
+                    text = stringResource(R.string.feature_drawing_move_to_myworks),
                     onClick = {
                         navigateToMyWorks()
                     }

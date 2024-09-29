@@ -1,7 +1,6 @@
 package com.dev.philo.fillsketch.feature.drawing.screen
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -38,6 +37,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
@@ -53,6 +53,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.drawing.R
 import com.dev.philo.fillsketch.feature.drawing.component.CheckeredBackgroundBox
 import com.dev.philo.fillsketch.feature.drawing.component.ColorPickerDialog
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
@@ -261,7 +262,7 @@ fun DrawingContent(
                         textModifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = Paddings.xextra),
-                        text = "Once you reset, you cannot revert.\nDo you want to reset?",
+                        text = stringResource(R.string.feature_drawing_reset_description),
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.tertiary,
                             lineHeight = 20.sp
@@ -280,7 +281,7 @@ fun DrawingContent(
                             .width(200.dp),
                         playSoundEffect = playSoundEffect,
                         painter = painterResource(id = DesignSystemR.drawable.ic_trash),
-                        text = "reset",
+                        text = stringResource(R.string.feature_drawing_reset),
                         onClick = {
                             reset()
                             resetDialogVisible = false

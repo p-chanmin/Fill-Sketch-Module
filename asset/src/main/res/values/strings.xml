@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="title" tools:ignore="ResourceName">Fill Sketch!</string>
-    <string name="version_title" tools:ignore="ResourceName">: Princess</string>
+<resources>
+    <string name="asset_title">Fill Sketch!</string>
+    <string name="asset_version_title">: Princess</string>
 </resources>

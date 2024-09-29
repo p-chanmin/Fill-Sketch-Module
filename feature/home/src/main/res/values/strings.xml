@@ -1,3 +1,30 @@
 <resources>
-    <string name="app_name">home</string>
+    <string name="feature_home_background">background</string>
+    <string name="feature_home_sound_setting">sound setting</string>
+    <string name="feature_home_bgm_setting">bgm setting</string>
+    <string name="feature_home_setting">setting</string>
+    <string name="feature_home_background_character">background character</string>
+
+    <string name="feature_home_sketch">Sketch</string>
+    <string name="feature_home_myworks">MyWorks</string>
+
+    <string name="feature_home_delete">delete</string>
+    <string name="feature_home_delete_description">Once deleted, it can\'t be undone.\nIs it okay to delete?</string>
+
+    <string name="feature_home_select_sketch">Select Sketch !</string>
+    <string name="feature_home_select_work">Select Work !</string>
+
+    <string name="feature_home_watch_ad">Watch Ad</string>
+
+    <string name="feature_home_share">Share</string>
+    <string name="feature_home_rate_us">Rate us</string>
+    <string name="feature_home_privacy_policy">Privacy policy</string>
+    <string name="feature_home_terms_of_service">Terms of Service</string>
+    <string name="feature_home_source_support">Source Support</string>
+
+    <string name="feature_home_play_store_uri">https://play.google.com/store/apps/details?id=%1$s</string>
+    <string name="feature_home_share_description">Color your sketches with Fill Sketch App! Have fun and show your creativity as you bring your drawings to life!\n%1$s</string>
+    <string name="feature_home_privacy_policy_uri">https://sites.google.com/view/fill-sketch-privacy-policy</string>
+    <string name="feature_home_terms_of_service_uri">https://sites.google.com/view/fill-sketch-terms-of-service</string>
+    <string name="feature_home_source_support_uri">https://sites.google.com/view/fill-sketch-source</string>
 </resources>

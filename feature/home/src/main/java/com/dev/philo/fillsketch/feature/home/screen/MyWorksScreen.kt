@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.home.R
 import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
 import com.dev.philo.fillsketch.feature.home.model.MyWork
 import com.dev.philo.fillsketch.feature.home.model.MyWorksUiState
@@ -102,7 +104,7 @@ fun MyWorksContent(
 
             OutlinedText(
                 textModifier = Modifier,
-                text = "My Works",
+                text = stringResource(R.string.feature_home_myworks),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 35.sp,
                     color = MaterialTheme.colorScheme.tertiary
@@ -155,7 +157,7 @@ fun MyWorksContent(
                                     textModifier = Modifier
                                         .fillMaxWidth()
                                         .padding(vertical = Paddings.xextra),
-                                    text = "Once deleted, it can't be undone.\nIs it okay to delete?",
+                                    text = stringResource(R.string.feature_home_delete_description),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.tertiary,
                                         lineHeight = 20.sp
@@ -174,7 +176,7 @@ fun MyWorksContent(
                                         .width(200.dp),
                                     playSoundEffect = playSoundEffect,
                                     painter = painterResource(id = DesignSystemR.drawable.ic_trash),
-                                    text = "delete",
+                                    text = stringResource(R.string.feature_home_delete),
                                     onClick = {
                                         deleteMyWork(it.id)
                                     }

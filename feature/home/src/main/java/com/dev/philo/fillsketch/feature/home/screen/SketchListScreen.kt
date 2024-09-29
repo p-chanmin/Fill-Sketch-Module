@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.asset.SketchResource
-import com.dev.philo.fillsketch.core.designsystem.R
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchCard
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingButton
@@ -51,6 +51,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.Sketch
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.home.R
 import com.dev.philo.fillsketch.feature.home.component.MyWorkImage
 import com.dev.philo.fillsketch.feature.home.model.MyWork
 import com.dev.philo.fillsketch.feature.home.model.SketchListUiEvent
@@ -134,7 +135,7 @@ fun SketchListContent(
 
             OutlinedText(
                 textModifier = Modifier,
-                text = "Select Sketch !",
+                text = stringResource(R.string.feature_home_select_sketch),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontSize = 35.sp,
                     color = MaterialTheme.colorScheme.tertiary
@@ -184,7 +185,7 @@ fun SketchListContent(
 
         if (sketchListUiState.dialogMyWorksVisible && sketchListUiState.selectedSketchId != null) {
             FillSketchDialog(
-                titleText = "Select Work !",
+                titleText = stringResource(R.string.feature_home_select_work),
                 onDismissRequest = { dismissDialog() },
                 playSoundEffect = playSoundEffect,
             ) {
@@ -202,7 +203,7 @@ fun SketchListContent(
                                 .height(60.dp)
                                 .fillMaxWidth(),
                             playSoundEffect = playSoundEffect,
-                            painter = painterResource(id = R.drawable.ic_plus),
+                            painter = painterResource(id = DesignSystemR.drawable.ic_plus),
                             color = MaterialTheme.colorScheme.onPrimary,
                             onClick = {
                                 addMyWork(
@@ -243,7 +244,7 @@ fun SketchListContent(
                                         textModifier = Modifier
                                             .fillMaxWidth()
                                             .padding(vertical = Paddings.xextra),
-                                        text = "Once deleted, it can't be undone.\nIs it okay to delete?",
+                                        text = stringResource(id = R.string.feature_home_delete_description),
                                         style = MaterialTheme.typography.bodySmall.copy(
                                             color = MaterialTheme.colorScheme.tertiary,
                                             lineHeight = 20.sp
@@ -262,7 +263,7 @@ fun SketchListContent(
                                             .width(200.dp),
                                         playSoundEffect = playSoundEffect,
                                         painter = painterResource(id = DesignSystemR.drawable.ic_trash),
-                                        text = "delete",
+                                        text = stringResource(id = R.string.feature_home_delete),
                                         onClick = {
                                             deleteMyWork(it.sketchType, it.id)
                                         }
@@ -298,8 +299,8 @@ fun SketchListContent(
                             .height(60.dp)
                             .fillMaxWidth(),
                         playSoundEffect = playSoundEffect,
-                        painter = painterResource(id = R.drawable.ic_ads),
-                        text = "Watch Ad",
+                        painter = painterResource(id = DesignSystemR.drawable.ic_ads),
+                        text = stringResource(R.string.feature_home_watch_ad),
                         onClick = {
                             // 광고 보기
                             unlockSketch(sketchListUiState.selectedSketchId)

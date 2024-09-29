@@ -53,6 +53,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.home.R
 import com.dev.philo.fillsketch.feature.home.model.HomeUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.HomeViewModel
 import kotlin.math.roundToInt
@@ -103,7 +104,7 @@ fun HomeContent(
             painter = painterResource(
                 id = com.dev.philo.fillsketch.asset.R.drawable.img_background
             ),
-            contentDescription = "background",
+            contentDescription = stringResource(R.string.feature_home_background),
             contentScale = ContentScale.Crop
         )
 
@@ -120,6 +121,7 @@ fun HomeContent(
                 } else {
                     painterResource(id = DesignSystemR.drawable.ic_se_off)
                 },
+                contentDescription = stringResource(R.string.feature_home_sound_setting),
                 onClick = { updateSoundEffectSetting() }
             )
 
@@ -131,6 +133,7 @@ fun HomeContent(
                 } else {
                     painterResource(id = DesignSystemR.drawable.ic_bgm_off)
                 },
+                contentDescription = stringResource(R.string.feature_home_bgm_setting),
                 onClick = { updateBackgroundMusicSetting() }
             )
 
@@ -138,6 +141,7 @@ fun HomeContent(
                 modifier = Modifier.size(60.dp),
                 playSoundEffect = playSoundEffect,
                 painter = painterResource(id = DesignSystemR.drawable.ic_setting),
+                contentDescription = stringResource(R.string.feature_home_setting),
                 onClick = { settingDialogVisible = true }
             )
         }
@@ -175,7 +179,7 @@ fun HomeContent(
                 OutlinedText(
                     textModifier = Modifier
                         .padding(bottom = Paddings.xsmall),
-                    text = stringResource(id = AssetR.string.title),
+                    text = stringResource(id = AssetR.string.asset_title),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontSize = 60.sp,
                         color = MaterialTheme.colorScheme.tertiary
@@ -189,7 +193,7 @@ fun HomeContent(
                 OutlinedText(
                     textModifier = Modifier
                         .padding(bottom = Paddings.xsmall),
-                    text = stringResource(id = AssetR.string.version_title),
+                    text = stringResource(id = AssetR.string.asset_version_title),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontSize = 30.sp,
                         color = MaterialTheme.colorScheme.tertiary
@@ -207,7 +211,7 @@ fun HomeContent(
                 painter = painterResource(
                     id = AssetR.drawable.img_home_character
                 ),
-                contentDescription = "main Character",
+                contentDescription = stringResource(R.string.feature_home_background_character),
                 contentScale = ContentScale.FillHeight
             )
         }
@@ -248,7 +252,7 @@ fun HomeContent(
                 FillSketchMainButton(
                     modifier = Modifier.size(150.dp),
                     playSoundEffect = playSoundEffect,
-                    text = "Sketch",
+                    text = stringResource(R.string.feature_home_sketch),
                     painter = painterResource(id = AssetR.drawable.img_sketch),
                     onClick = { navigateToSketchList() }
                 )
@@ -258,7 +262,7 @@ fun HomeContent(
                 FillSketchMainButton(
                     modifier = Modifier.size(150.dp),
                     playSoundEffect = playSoundEffect,
-                    text = "MyWorks",
+                    text = stringResource(R.string.feature_home_myworks),
                     painter = painterResource(id = AssetR.drawable.img_myworks),
                     onClick = { navigateToMyWorks() }
                 )
@@ -272,11 +276,18 @@ fun HomeContent(
             playSoundEffect = playSoundEffect,
             onShareClick = {
                 val appPackageName = context.packageName
+                val uri = context.getString(
+                    R.string.feature_home_play_store_uri,
+                    appPackageName
+                )
                 val shareIntent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(
                         Intent.EXTRA_TEXT,
-                        "Color your sketches with Fill Sketch App! Have fun and show your creativity as you bring your drawings to life!\nhttps://play.google.com/store/apps/details?id=$appPackageName"
+                        context.getString(
+                            R.string.feature_home_share_description,
+                            uri
+                        )
                     )
                     type = "text/plain"
                 }
@@ -287,22 +298,27 @@ fun HomeContent(
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                        Uri.parse(
+                            context.getString(
+                                R.string.feature_home_play_store_uri,
+                                appPackageName
+                            )
+                        )
                     )
                 )
             },
             onPrivacyPolicyClick = {
-                val url = "https://sites.google.com/view/fill-sketch-privacy-policy"
+                val url = context.getString(R.string.feature_home_privacy_policy_uri)
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
             },
             onTermsOfServiceClick = {
-                val url = "https://sites.google.com/view/fill-sketch-terms-of-service"
+                val url = context.getString(R.string.feature_home_terms_of_service_uri)
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
             },
             onSourceSupportClick = {
-                val url = "https://sites.google.com/view/fill-sketch-source"
+                val url = context.getString(R.string.feature_home_source_support_uri)
                 val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 context.startActivity(intent)
             },
@@ -342,11 +358,11 @@ fun SettingDialog(
                         .padding(start = Paddings.large)
                         .size(32.dp),
                     painter = painterResource(id = DesignSystemR.drawable.ic_share),
-                    contentDescription = "share"
+                    contentDescription = stringResource(R.string.feature_home_share)
                 )
                 OutlinedText(
                     modifier = Modifier.padding(start = Paddings.large),
-                    text = "Share",
+                    text = stringResource(R.string.feature_home_share),
                     style = MaterialTheme.typography.labelLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
@@ -376,11 +392,11 @@ fun SettingDialog(
                         .padding(start = Paddings.large)
                         .size(32.dp),
                     painter = painterResource(id = DesignSystemR.drawable.ic_rate),
-                    contentDescription = "share"
+                    contentDescription = stringResource(R.string.feature_home_rate_us)
                 )
                 OutlinedText(
                     modifier = Modifier.padding(start = Paddings.large),
-                    text = "Rate us",
+                    text = stringResource(R.string.feature_home_rate_us),
                     style = MaterialTheme.typography.labelLarge.copy(
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
@@ -407,7 +423,7 @@ fun SettingDialog(
                             playSoundEffect(SoundEffect.BUTTON_CLICK)
                             onPrivacyPolicyClick()
                         },
-                        text = "Privacy policy",
+                        text = stringResource(R.string.feature_home_privacy_policy),
                         style = TextStyle(
                             fontFamily = null,
                             fontSize = 12.sp,
@@ -421,7 +437,7 @@ fun SettingDialog(
                             playSoundEffect(SoundEffect.BUTTON_CLICK)
                             onTermsOfServiceClick()
                         },
-                        text = "Terms of Service",
+                        text = stringResource(R.string.feature_home_terms_of_service),
                         style = TextStyle(
                             fontFamily = null,
                             fontSize = 12.sp,
@@ -435,7 +451,7 @@ fun SettingDialog(
                             playSoundEffect(SoundEffect.BUTTON_CLICK)
                             onSourceSupportClick()
                         },
-                        text = "Source Support",
+                        text = stringResource(R.string.feature_home_source_support),
                         style = TextStyle(
                             fontFamily = null,
                             fontSize = 12.sp,

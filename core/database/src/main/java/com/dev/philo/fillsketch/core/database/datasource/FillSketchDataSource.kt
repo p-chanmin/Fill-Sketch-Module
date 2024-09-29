@@ -29,10 +29,12 @@ class FillSketchDataSource @Inject constructor(
         .map { it.list.toList().reversed() }
 
     fun getMagicBrushStateBySketchType(sketchType: Int) =
-        realm.query<SketchSchema>("sketchType == $0", sketchType).asFlow().map { it.list.first().hasMagicBrush }
+        realm.query<SketchSchema>("sketchType == $0", sketchType).asFlow()
+            .map { it.list.first().hasMagicBrush }
 
     fun getDrawingResultById(drawingResultId: Int) =
-        realm.query<DrawingResultSchema>("_id == $0", drawingResultId).asFlow().map { it.list.first() }
+        realm.query<DrawingResultSchema>("_id == $0", drawingResultId).asFlow()
+            .map { it.list.first() }
 
     suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Int {
 
@@ -43,7 +45,7 @@ class FillSketchDataSource @Inject constructor(
                 DrawingResultSchema().apply {
                     this._id = id
                     this.sketchType = sketchType
-                    this.bitmapByteArray = latestByteArray
+                    this.latestMaskBitmapByteArray = latestByteArray
                 }
             )
         }
@@ -81,17 +83,21 @@ class FillSketchDataSource @Inject constructor(
 
     suspend fun updateDrawingResult(
         drawingResultId: Int,
-        bitmapByteArray: ByteArray
+        latestMaskBitmapByteArray: ByteArray,
+        resultBitmapByteArray: ByteArray,
     ) {
         realm.write {
-            val drawingResult = query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
-            drawingResult.bitmapByteArray = bitmapByteArray
+            val drawingResult =
+                query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
+            drawingResult.latestMaskBitmapByteArray = latestMaskBitmapByteArray
+            drawingResult.resultBitmapByteArray = resultBitmapByteArray
         }
     }
 
     suspend fun deleteDrawingResult(drawingResultId: Int) {
         realm.write {
-            val drawingResult = query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
+            val drawingResult =
+                query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
             delete(drawingResult)
         }
     }

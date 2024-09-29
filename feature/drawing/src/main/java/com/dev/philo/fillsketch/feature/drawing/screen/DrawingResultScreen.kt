@@ -5,6 +5,8 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,19 +67,21 @@ fun DrawingResultScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val recommendImageBitmap =
+    val sketchDpi =
         ImageBitmap.imageResource(SketchResource.sketchRecommendResourceIds[sketchType])
-    val outlineImageBitmap =
-        ImageBitmap.imageResource(SketchResource.sketchOutlineResourceIds[sketchType])
+            .asAndroidBitmap().density
 
     LaunchedEffect(Unit) {
-        drawingResultViewModel.fetchDrawingUiState(sketchType, drawingResultId)
+        drawingResultViewModel.fetchDrawingUiState(
+            sketchType,
+            drawingResultId,
+            sketchDpi
+        )
     }
 
     val drawingResultUiState by drawingResultViewModel.drawingResultUiState.collectAsStateWithLifecycle()
 
     DrawingResultContent(
-        sketchType = sketchType,
         drawingResultUiState = drawingResultUiState,
         navigateToDrawing = { navigateToDrawing(sketchType, drawingResultId) },
         dismissSaveCompleteDialog = { drawingResultViewModel.updateSaveCompleteDialogVisible(false) },
@@ -86,8 +90,7 @@ fun DrawingResultScreen(
         playSoundEffect = playSoundEffect,
         saveDrawingResult = {
             coroutineScope.launch {
-                val resultBitmap =
-                    drawingResultViewModel.getResultBitmap(recommendImageBitmap, outlineImageBitmap)
+                val resultBitmap = drawingResultUiState.resultBitmap
 
                 val timeStamp = System.currentTimeMillis()
                 val imageFileName =
@@ -128,7 +131,6 @@ fun DrawingResultScreen(
 
 @Composable
 fun DrawingResultContent(
-    sketchType: Int,
     drawingResultUiState: DrawingResultUiState,
     navigateToDrawing: () -> Unit,
     dismissSaveCompleteDialog: () -> Unit,
@@ -140,57 +142,61 @@ fun DrawingResultContent(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(Paddings.xlarge),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        AnimatedVisibility(
+            visible = !drawingResultUiState.isLoading,
+            enter = fadeIn(),
         ) {
-            OutlinedText(
-                textModifier = Modifier,
-                text = "Download Your Drawing !",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    color = MaterialTheme.colorScheme.tertiary,
-                ),
-                outlineColor = MaterialTheme.colorScheme.onTertiary,
-                outlineDrawStyle = Stroke(
-                    width = 15f
-                ),
-                textAlign = TextAlign.Center
-            )
-
-            DrawingResultImage(
+            Column(
                 modifier = Modifier
-                    .width(400.dp)
-                    .padding(Paddings.xextra),
-                sketchType = sketchType,
-                latestBitmap = drawingResultUiState.latestBitmap
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(Paddings.xlarge),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                FillSketchSettingButton(
-                    modifier = Modifier
-                        .height(60.dp)
-                        .width(60.dp),
-                    playSoundEffect = playSoundEffect,
-                    painter = painterResource(id = DesignSystemR.drawable.ic_edit),
-                    onClick = { navigateToDrawing() }
+                OutlinedText(
+                    textModifier = Modifier,
+                    text = "Download Your Drawing !",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.tertiary,
+                    ),
+                    outlineColor = MaterialTheme.colorScheme.onTertiary,
+                    outlineDrawStyle = Stroke(
+                        width = 15f
+                    ),
+                    textAlign = TextAlign.Center
                 )
-                FillSketchSettingButton(
+
+                DrawingResultImage(
                     modifier = Modifier
-                        .padding(start = 32.dp)
-                        .height(60.dp)
-                        .width(200.dp),
-                    playSoundEffect = playSoundEffect,
-                    painter = painterResource(id = DesignSystemR.drawable.ic_download),
-                    onClick = { saveDrawingResult() }
+                        .width(400.dp)
+                        .padding(Paddings.xextra),
+                    resultBitmap = drawingResultUiState.resultBitmap
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    FillSketchSettingButton(
+                        modifier = Modifier
+                            .height(60.dp)
+                            .width(60.dp),
+                        playSoundEffect = playSoundEffect,
+                        painter = painterResource(id = DesignSystemR.drawable.ic_edit),
+                        onClick = { navigateToDrawing() }
+                    )
+                    FillSketchSettingButton(
+                        modifier = Modifier
+                            .padding(start = 32.dp)
+                            .height(60.dp)
+                            .width(200.dp),
+                        playSoundEffect = playSoundEffect,
+                        painter = painterResource(id = DesignSystemR.drawable.ic_download),
+                        onClick = { saveDrawingResult() }
+                    )
+                }
             }
         }
 
@@ -250,10 +256,10 @@ fun DrawingResultContent(
 fun DrawingResultContentPreview() {
     FillSketchTheme {
         DrawingResultContent(
-            sketchType = 0,
             drawingResultUiState = DrawingResultUiState(
+                isLoading = false,
                 saveCompleteDialogVisible = false,
-                latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                resultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
                     .asAndroidBitmap()
             ),
             navigateToDrawing = {},

@@ -8,13 +8,19 @@ data class MyWork(
     val id: Int = 0,
     val sketchType: Int = 0,
     val latestBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+    val resultBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
     val hasMagicBrush: Boolean = false
 ) {
     companion object {
-        fun create(drawingResult: DrawingResult): MyWork = MyWork(
+        fun create(drawingResult: DrawingResult, bitmapDpi: Int): MyWork = MyWork(
             id = drawingResult.id,
             sketchType = drawingResult.sketchType,
-            latestBitmap = byteArrayToBitmap(drawingResult.bitmapByteArray),
+            latestBitmap = byteArrayToBitmap(drawingResult.latestMaskBitmapByteArray).apply {
+                density = bitmapDpi
+            },
+            resultBitmap = byteArrayToBitmap(drawingResult.resultBitmapByteArray).apply {
+                density = bitmapDpi
+            },
             hasMagicBrush = drawingResult.hasMagicBrush
         )
 

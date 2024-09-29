@@ -1,8 +1,6 @@
 package com.dev.philo.fillsketch.feature.drawing.component
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -63,7 +61,6 @@ import com.dev.philo.fillsketch.asset.SketchResource
 import com.dev.philo.fillsketch.core.designsystem.component.FillSketchDialog
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
-import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
@@ -456,8 +453,7 @@ fun DrawingPalette(
 fun ColorPickerDialog(
     onDismiss: () -> Unit,
     colorPickerController: ColorPickerController,
-    sketchType: Int,
-    currentMaskBitmap: Bitmap,
+    currentResultBitmap: Bitmap,
     initialColor: Color,
     playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
@@ -481,35 +477,11 @@ fun ColorPickerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (dropperMode) {
-
-                    val recommendAndroidBitmap =
-                        ImageBitmap.imageResource(SketchResource.sketchRecommendResourceIds[sketchType])
-                            .asAndroidBitmap()
-                    val maskBitmap = currentMaskBitmap.copy(Bitmap.Config.ARGB_8888, true)
-                    maskBitmap.density = recommendAndroidBitmap.density
-                    val outlineAndroidBitmap =
-                        ImageBitmap.imageResource(SketchResource.sketchOutlineResourceIds[sketchType])
-                            .asAndroidBitmap()
-                    val resultBitmap = getEmptyBitmapBySize(
-                        maskBitmap.width,
-                        maskBitmap.height,
-                        maskBitmap.density,
-                        whiteBackground = true
-                    )
-                    val resultCanvas = Canvas(resultBitmap)
-                    val paint = Paint()
-
-                    resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
-                    resultCanvas.drawBitmap(maskBitmap, 0f, 0f, paint)
-                    resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
-
-                    val result = remember { mutableStateOf(resultBitmap) }
-
                     ImageDropper(
                         modifier = Modifier
                             .size(350.dp)
                             .padding(10.dp),
-                        imageBitmap = result.value,
+                        imageBitmap = currentResultBitmap,
                         selectColor = { color ->
                             controller.selectByColor(color, true)
                             colorPickerController.selectByColor(color, true)
@@ -712,8 +684,7 @@ fun ColorPickerDialogPreview() {
         ColorPickerDialog(
             onDismiss = { },
             colorPickerController = colorPickerController,
-            sketchType = 0,
-            currentMaskBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+            currentResultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
                 .asAndroidBitmap(),
             initialColor = Color.Red
         )

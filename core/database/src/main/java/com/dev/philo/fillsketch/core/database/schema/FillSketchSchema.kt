@@ -18,5 +18,6 @@ class DrawingResultSchema : RealmObject {
     @PrimaryKey
     var _id: Int = 0
     var sketchType: Int = -1
-    var bitmapByteArray: ByteArray = ByteArray(0)
+    var latestMaskBitmapByteArray: ByteArray = ByteArray(0)
+    var resultBitmapByteArray: ByteArray = ByteArray(0)
 }

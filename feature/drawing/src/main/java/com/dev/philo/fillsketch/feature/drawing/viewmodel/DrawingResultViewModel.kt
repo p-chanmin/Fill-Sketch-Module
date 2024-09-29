@@ -3,18 +3,10 @@ package com.dev.philo.fillsketch.feature.drawing.viewmodel
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Paint.Style
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.philo.fillsketch.core.data.repository.DrawingResultRepository
-import com.dev.philo.fillsketch.core.designsystem.utils.createPath
 import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
-import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingResultUiState
 import com.dev.philo.fillsketch.feature.drawing.model.MyWork
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,15 +30,20 @@ class DrawingResultViewModel @Inject constructor(
     private val _drawingResultUiState = MutableStateFlow(DrawingResultUiState())
     val drawingResultUiState = _drawingResultUiState.asStateFlow()
 
-    fun fetchDrawingUiState(sketchType: Int, drawingResultId: Int) {
+    fun fetchDrawingUiState(
+        sketchType: Int,
+        drawingResultId: Int,
+        dpi: Int
+    ) {
         viewModelScope.launch {
-            val myWork =
-                MyWork.create(
-                    drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
-                )
+            val myWork = MyWork.create(
+                drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first(),
+                dpi
+            )
             _drawingResultUiState.update {
                 it.copy(
-                    latestBitmap = myWork.latestBitmap
+                    isLoading = false,
+                    resultBitmap = myWork.resultBitmap
                 )
             }
         }
@@ -62,15 +59,11 @@ class DrawingResultViewModel @Inject constructor(
         }
     }
 
-    fun getResultBitmap(
-        recommendImageBitmap: ImageBitmap,
-        outlineImageBitmap: ImageBitmap
+    private fun getResultBitmap(
+        recommendAndroidBitmap: Bitmap,
+        outlineAndroidBitmap: Bitmap,
+        latestBitmap: Bitmap,
     ): Bitmap {
-        val recommendAndroidBitmap = recommendImageBitmap.asAndroidBitmap()
-        val outlineAndroidBitmap = outlineImageBitmap.asAndroidBitmap()
-
-        _drawingResultUiState.value.latestBitmap.density = recommendAndroidBitmap.density
-
         val resultBitmap = getEmptyBitmapBySize(
             recommendAndroidBitmap.width,
             recommendAndroidBitmap.height,
@@ -82,7 +75,7 @@ class DrawingResultViewModel @Inject constructor(
         val paint = Paint()
 
         resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
-        resultCanvas.drawBitmap(_drawingResultUiState.value.latestBitmap, 0f, 0f, paint)
+        resultCanvas.drawBitmap(latestBitmap, 0f, 0f, paint)
         resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
 
         return resultBitmap

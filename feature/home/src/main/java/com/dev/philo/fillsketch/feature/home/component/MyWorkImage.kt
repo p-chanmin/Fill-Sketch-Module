@@ -1,7 +1,6 @@
 package com.dev.philo.fillsketch.feature.home.component
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,23 +26,16 @@ import com.dev.philo.fillsketch.core.designsystem.component.FillSketchSettingBut
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.home.model.MyWork
 
 @Composable
 fun MyWorkImage(
     modifier: Modifier = Modifier,
-    sketchType: Int,
-    latestBitmap: Bitmap,
+    myWork: MyWork,
     onClick: () -> Unit,
     onDeleteClick: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
-
-    val recommendImageBitmap =
-        ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[sketchType])
-
-    val outlineImageBitmap =
-        ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[sketchType])
-
     Surface(
         modifier = modifier
             .border(
@@ -61,17 +53,7 @@ fun MyWorkImage(
     ) {
         Box {
             Image(
-                bitmap = recommendImageBitmap,
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = latestBitmap.asImageBitmap(),
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = outlineImageBitmap,
+                bitmap = myWork.resultBitmap.asImageBitmap(),
                 contentDescription = null
             )
 
@@ -95,9 +77,10 @@ fun MyWorkImage(
 fun MyWorkImagePreview() {
     FillSketchTheme {
         MyWorkImage(
-            sketchType = 0,
-            latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
-                .asAndroidBitmap(),
+            myWork = MyWork(
+                resultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                    .asAndroidBitmap()
+            ),
             onClick = {},
             onDeleteClick = {}
         )

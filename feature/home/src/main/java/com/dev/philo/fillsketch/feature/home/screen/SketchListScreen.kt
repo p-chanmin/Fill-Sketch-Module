@@ -220,8 +220,7 @@ fun SketchListContent(
                         var deleteDialog by remember { mutableStateOf(false) }
 
                         MyWorkImage(
-                            sketchType = it.sketchType,
-                            latestBitmap = it.latestBitmap,
+                            myWork = it,
                             playSoundEffect = playSoundEffect,
                             onClick = {
                                 dismissDialog()

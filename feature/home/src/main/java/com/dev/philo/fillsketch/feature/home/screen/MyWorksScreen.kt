@@ -135,8 +135,7 @@ fun MyWorksContent(
                     var deleteDialog by remember { mutableStateOf(false) }
 
                     MyWorkImage(
-                        sketchType = it.sketchType,
-                        latestBitmap = it.latestBitmap,
+                        myWork = it,
                         playSoundEffect = playSoundEffect,
                         onClick = { navigateToDrawingResult(it.sketchType, it.id) },
                         onDeleteClick = { deleteDialog = true },
@@ -201,13 +200,13 @@ fun MyWorksContentPreview() {
                     MyWork(
                         id = 0,
                         sketchType = 0,
-                        latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                        resultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
                             .asAndroidBitmap()
                     ),
                     MyWork(
                         id = 1,
                         sketchType = 1,
-                        latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[1])
+                        resultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[1])
                             .asAndroidBitmap()
                     )
                 )

@@ -17,7 +17,8 @@ class DrawingResultRepository @Inject constructor(
                 DrawingResult(
                     id = it._id,
                     sketchType = it.sketchType,
-                    bitmapByteArray = it.bitmapByteArray,
+                    latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
+                    resultBitmapByteArray = it.resultBitmapByteArray,
                     hasMagicBrush = fillSketchDataSource.getMagicBrushStateBySketchType(sketchType)
                         .first()
                 )
@@ -32,8 +33,13 @@ class DrawingResultRepository @Inject constructor(
 
     suspend fun updateDrawingResult(
         drawingResultId: Int,
-        bitmapByteArray: ByteArray
+        latestMaskBitmapByteArray: ByteArray,
+        resultBitmapByteArray: ByteArray
     ) {
-        fillSketchDataSource.updateDrawingResult(drawingResultId, bitmapByteArray)
+        fillSketchDataSource.updateDrawingResult(
+            drawingResultId = drawingResultId,
+            latestMaskBitmapByteArray = latestMaskBitmapByteArray,
+            resultBitmapByteArray = resultBitmapByteArray
+        )
     }
 }

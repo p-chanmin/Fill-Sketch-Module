@@ -1,6 +1,5 @@
 package com.dev.philo.fillsketch.feature.drawing.screen
 
-import android.graphics.Bitmap
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -36,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -89,23 +87,16 @@ fun DrawingScreen(
         drawingViewModel.fetchDrawingUiState(
             sketchType,
             drawingResultId,
-            recommendImageBitmap.width,
-            recommendImageBitmap.height,
-            recommendImageBitmap.asAndroidBitmap().density
+            recommendImageBitmap,
+            outlineImageBitmap,
         )
     }
 
     val drawingUiState by drawingViewModel.drawingUiState.collectAsStateWithLifecycle()
-    val currentMaskBitmap by drawingViewModel.currentMaskBitmap
-    val liveDrawingMaskBitmap by drawingViewModel.liveDrawingMaskBitmap
 
     DrawingContent(
         modifier = Modifier.fillMaxSize(),
         drawingUiState = drawingUiState,
-        outlineImageBitmap = outlineImageBitmap,
-        recommendImageBitmap = recommendImageBitmap,
-        currentMaskBitmap = currentMaskBitmap,
-        liveDrawingMaskBitmap = liveDrawingMaskBitmap,
         redoPathSize = drawingViewModel.redoPathSize,
         undoPathSize = drawingViewModel.undoPathSize,
         insertNewPath = drawingViewModel::insertNewPath,
@@ -128,10 +119,6 @@ fun DrawingScreen(
 fun DrawingContent(
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
-    outlineImageBitmap: ImageBitmap,
-    recommendImageBitmap: ImageBitmap,
-    currentMaskBitmap: Bitmap,
-    liveDrawingMaskBitmap: Bitmap,
     redoPathSize: Int,
     undoPathSize: Int,
     insertNewPath: (Offset) -> Unit,
@@ -167,10 +154,6 @@ fun DrawingContent(
                 offset = Offset((offset.x + pan.x * scale), (offset.y + pan.y * scale))
             },
             drawingUiState = drawingUiState,
-            outlineImageBitmap = outlineImageBitmap,
-            recommendImageBitmap = recommendImageBitmap,
-            currentMaskBitmap = currentMaskBitmap,
-            liveDrawingMaskBitmap = liveDrawingMaskBitmap,
             insertNewPath = insertNewPath,
             updateLatestPath = updateLatestPath,
             drawOnNewMask = drawOnNewMask,
@@ -245,8 +228,7 @@ fun DrawingContent(
                 onDismiss = { colorPaletteDialog = false },
                 playSoundEffect = playSoundEffect,
                 colorPickerController = colorPickerController,
-                sketchType = drawingUiState.sketchType,
-                currentMaskBitmap = currentMaskBitmap,
+                currentResultBitmap = drawingUiState.currentResultBitmap,
                 initialColor = drawingUiState.strokeColor
             )
         }
@@ -359,10 +341,6 @@ fun DrawingCanvas(
     onDrag: (Offset, Float) -> Unit,
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
-    outlineImageBitmap: ImageBitmap,
-    recommendImageBitmap: ImageBitmap,
-    currentMaskBitmap: Bitmap,
-    liveDrawingMaskBitmap: Bitmap,
     insertNewPath: (Offset) -> Unit,
     updateLatestPath: (Offset) -> Unit,
     drawOnNewMask: () -> Unit,
@@ -396,11 +374,6 @@ fun DrawingCanvas(
                 )
         ) {
             Image(
-                bitmap = recommendImageBitmap,
-                contentDescription = null
-            )
-
-            Image(
                 modifier = Modifier
                     .pointerInput(drawingUiState.actionType) {
                         when (drawingUiState.actionType) {
@@ -431,17 +404,7 @@ fun DrawingCanvas(
                             else -> {}
                         }
                     },
-                bitmap = currentMaskBitmap.asImageBitmap(),
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = liveDrawingMaskBitmap.asImageBitmap(),
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = outlineImageBitmap,
+                bitmap = drawingUiState.currentResultBitmap.asImageBitmap(),
                 contentDescription = null
             )
         }
@@ -458,12 +421,6 @@ fun DrawingContentPreview() {
                 width = 1024,
                 height = 1536
             ),
-            outlineImageBitmap = ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[0]),
-            recommendImageBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0]),
-            currentMaskBitmap = ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[0])
-                .asAndroidBitmap(),
-            liveDrawingMaskBitmap = ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[0])
-                .asAndroidBitmap(),
             redoPathSize = 10,
             undoPathSize = 10,
             insertNewPath = { },

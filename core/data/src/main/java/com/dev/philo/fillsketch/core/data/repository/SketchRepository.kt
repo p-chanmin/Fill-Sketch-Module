@@ -38,7 +38,8 @@ class SketchRepository @Inject constructor(
                     DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
-                        bitmapByteArray = it.bitmapByteArray
+                        latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
+                        resultBitmapByteArray = it.resultBitmapByteArray
                     )
                 }
             }
@@ -50,7 +51,8 @@ class SketchRepository @Inject constructor(
                     DrawingResult(
                         id = it._id,
                         sketchType = it.sketchType,
-                        bitmapByteArray = it.bitmapByteArray
+                        latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
+                        resultBitmapByteArray = it.resultBitmapByteArray
                     )
                 }
             }

@@ -11,11 +11,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dev.philo.fillsketch.core.data.repository.DrawingResultRepository
 import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper
-import com.dev.philo.fillsketch.core.designsystem.model.PathWrapper.Companion.toPathData
 import com.dev.philo.fillsketch.core.designsystem.utils.createPath
 import com.dev.philo.fillsketch.core.designsystem.utils.getEmptyBitmapBySize
 import com.dev.philo.fillsketch.core.model.ActionType
@@ -47,33 +48,46 @@ class DrawingViewModel @Inject constructor(
 
     private val _redoPathList = mutableStateListOf<PathWrapper>()
     private val _undoPathList = mutableStateListOf<PathWrapper>()
-    val pathList: SnapshotStateList<PathWrapper> = _undoPathList
+    private val pathList: SnapshotStateList<PathWrapper> = _undoPathList
 
     val redoPathSize get() = _redoPathList.size
     val undoPathSize get() = _undoPathList.size
 
-    val currentMaskBitmap = mutableStateOf(
+    private val currentMaskBitmap = mutableStateOf(
         getEmptyBitmapBySize(1, 1, 160, whiteBackground = true)
     )
 
-    val liveDrawingMaskBitmap = mutableStateOf(
+    private val liveDrawingMaskBitmap = mutableStateOf(
         getEmptyBitmapBySize(1, 1, 160, whiteBackground = false)
     )
 
     fun fetchDrawingUiState(
         sketchType: Int,
         drawingResultId: Int,
-        width: Int,
-        height: Int,
-        dpi: Int
+        recommendImageBitmap: ImageBitmap,
+        outlineImageBitmap: ImageBitmap,
     ) {
         viewModelScope.launch {
+
+            val recommendAndroidBitmap = recommendImageBitmap.asAndroidBitmap()
+            val outlineAndroidBitmap = outlineImageBitmap.asAndroidBitmap()
+            val width = recommendAndroidBitmap.width
+            val height = recommendAndroidBitmap.height
+            val dpi = recommendAndroidBitmap.density
+
             val myWork = MyWork.create(
-                drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first()
+                drawingResultRepository.getDrawingResult(sketchType, drawingResultId).first(),
+                dpi
             )
+
             currentMaskBitmap.value = myWork.latestBitmap
             liveDrawingMaskBitmap.value =
-                getEmptyBitmapBySize(width, height, dpi, whiteBackground = false)
+                getEmptyBitmapBySize(
+                    width,
+                    height,
+                    dpi,
+                    whiteBackground = false
+                )
             _drawingUiState.update {
                 it.copy(
                     drawingResultId = myWork.id,
@@ -81,6 +95,8 @@ class DrawingViewModel @Inject constructor(
                     width = width,
                     height = height,
                     dpi = dpi,
+                    recommendAndroidBitmap = recommendAndroidBitmap,
+                    outlineAndroidBitmap = outlineAndroidBitmap,
                     latestBitmap = myWork.latestBitmap,
                     hasMagicBrush = myWork.hasMagicBrush
                 )
@@ -223,6 +239,7 @@ class DrawingViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
+            updateResultDrawing()
             saveCurrentDrawingResult()
         }
     }
@@ -272,12 +289,40 @@ class DrawingViewModel @Inject constructor(
                 liveDrawingMaskBitmap.value = maskBitmap
             }
         }
+        updateResultDrawing()
+    }
+
+    private fun updateResultDrawing() {
+        val recommendAndroidBitmap = _drawingUiState.value.recommendAndroidBitmap
+        val outlineAndroidBitmap = _drawingUiState.value.outlineAndroidBitmap
+
+        val resultBitmap = getEmptyBitmapBySize(
+            _drawingUiState.value.width,
+            _drawingUiState.value.height,
+            _drawingUiState.value.dpi,
+            whiteBackground = false
+        )
+
+        val resultCanvas = Canvas(resultBitmap)
+        val paint = Paint()
+
+        resultCanvas.drawBitmap(recommendAndroidBitmap, 0f, 0f, paint)
+        resultCanvas.drawBitmap(currentMaskBitmap.value, 0f, 0f, paint)
+        resultCanvas.drawBitmap(liveDrawingMaskBitmap.value, 0f, 0f, paint)
+        resultCanvas.drawBitmap(outlineAndroidBitmap, 0f, 0f, paint)
+
+        _drawingUiState.update {
+            it.copy(
+                currentResultBitmap = resultBitmap
+            )
+        }
     }
 
     private suspend fun saveCurrentDrawingResult() {
         drawingResultRepository.updateDrawingResult(
-            _drawingUiState.value.drawingResultId,
-            bitmapToByteArray(currentMaskBitmap.value)
+            drawingResultId = _drawingUiState.value.drawingResultId,
+            latestMaskBitmapByteArray = bitmapToByteArray(currentMaskBitmap.value),
+            resultBitmapByteArray = bitmapToByteArray(_drawingUiState.value.currentResultBitmap)
         )
     }
 

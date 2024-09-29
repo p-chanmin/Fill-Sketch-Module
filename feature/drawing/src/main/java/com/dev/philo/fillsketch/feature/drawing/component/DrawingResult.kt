@@ -23,16 +23,8 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 @Composable
 fun DrawingResultImage(
     modifier: Modifier = Modifier,
-    sketchType: Int,
-    latestBitmap: Bitmap,
+    resultBitmap: Bitmap,
 ) {
-
-    val recommendImageBitmap =
-        ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[sketchType])
-
-    val outlineImageBitmap =
-        ImageBitmap.imageResource(id = SketchResource.sketchOutlineResourceIds[sketchType])
-
     Surface(
         modifier = modifier
             .border(
@@ -46,17 +38,7 @@ fun DrawingResultImage(
     ) {
         Box {
             Image(
-                bitmap = recommendImageBitmap,
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = latestBitmap.asImageBitmap(),
-                contentDescription = null
-            )
-
-            Image(
-                bitmap = outlineImageBitmap,
+                bitmap = resultBitmap.asImageBitmap(),
                 contentDescription = null
             )
         }
@@ -69,8 +51,7 @@ fun DrawingResultImage(
 fun DrawingResultImagePreview() {
     FillSketchTheme {
         DrawingResultImage(
-            sketchType = 0,
-            latestBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+            resultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
                 .asAndroidBitmap()
         )
     }

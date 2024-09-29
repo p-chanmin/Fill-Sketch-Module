@@ -6,8 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
@@ -28,7 +26,7 @@ private val ColorScheme = lightColorScheme(
     onSecondaryContainer = Black,
     tertiary = SandyBrown1,
     onTertiary = Black,
-    outline = SandyBronw2,
+    outline = SandyBrown2,
     scrim = Black.copy(alpha = 0.30f)
 )
 

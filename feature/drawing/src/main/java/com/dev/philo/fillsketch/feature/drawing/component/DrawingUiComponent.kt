@@ -1,7 +1,16 @@
 package com.dev.philo.fillsketch.feature.drawing.component
 
 import android.graphics.Bitmap
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,6 +73,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.model.DrawingUiState
+import com.dev.philo.fillsketch.feature.drawing.model.PaletteVisible
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
@@ -119,333 +129,404 @@ fun DrawingPalette(
     updateActionType: (ActionType) -> Unit,
     updateStrokeWidth: (Float) -> Unit,
     updateMagicBrushState: () -> Unit,
+    initOffset: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
+    var paletteVisible by remember { mutableStateOf(PaletteVisible.FULL) }
     var currentPreColorIndex by remember { mutableIntStateOf(0) }
 
-    Row(
+    Column(
         modifier = modifier,
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
     ) {
-
         DrawingUiButton(
             modifier = Modifier
-                .padding(end = Paddings.medium)
-                .size(30.dp),
-            painter = painterResource(id = DesignSystemR.drawable.ic_left),
+                .padding(bottom = Paddings.large, end = Paddings.large)
+                .size(30.dp)
+                .align(Alignment.End),
             playSoundEffect = playSoundEffect,
+            painter = if (paletteVisible == PaletteVisible.HIDE) {
+                painterResource(id = DesignSystemR.drawable.ic_hide_up)
+            } else {
+                painterResource(id = DesignSystemR.drawable.ic_hide_down)
+            },
             onClick = {
-                if (currentPreColorIndex == 0) {
-                    currentPreColorIndex = presetColorList.size - 1
-                } else {
-                    currentPreColorIndex -= 1
+                paletteVisible = when (paletteVisible) {
+                    PaletteVisible.FULL -> PaletteVisible.HALF
+                    PaletteVisible.HALF -> PaletteVisible.HIDE
+                    PaletteVisible.HIDE -> PaletteVisible.FULL
                 }
             }
         )
-
-        Box(
+        DrawingUiButton(
             modifier = Modifier
-                .width(280.dp)
-                .padding(top = Paddings.xlarge),
+                .padding(end = Paddings.large)
+                .size(30.dp)
+                .align(Alignment.End),
+            playSoundEffect = playSoundEffect,
+            painter = painterResource(id = DesignSystemR.drawable.ic_screen),
+            onClick = { initOffset() }
+        )
+
+        AnimatedVisibility(
+            visible = paletteVisible != PaletteVisible.HIDE,
+            enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
         ) {
-            Surface(
-                modifier = Modifier
-                    .padding(top = Paddings.large)
-                    .fillMaxWidth()
-                    .border(
-                        1.dp,
-                        MaterialTheme.colorScheme.surfaceContainer,
-                        shape = RoundedCornerShape(8.dp)
-                    ),
-                color = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(8.dp),
-                shadowElevation = 4.dp
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = Paddings.medium)
-                        .padding(top = Paddings.extra, bottom = Paddings.medium),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Paddings.medium)
+                AnimatedVisibility(
+                    visible = paletteVisible == PaletteVisible.FULL,
+                    enter = slideInHorizontally(initialOffsetX = { -it }) + fadeIn(),
+                    exit = slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
                 ) {
-                    Row(
-                        modifier = Modifier,
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                    DrawingUiButton(
+                        modifier = Modifier
+                            .padding(end = Paddings.medium)
+                            .size(30.dp),
+                        painter = painterResource(id = DesignSystemR.drawable.ic_left),
+                        playSoundEffect = playSoundEffect,
+                        onClick = {
+                            if (currentPreColorIndex == 0) {
+                                currentPreColorIndex = presetColorList.size - 1
+                            } else {
+                                currentPreColorIndex -= 1
+                            }
+                        }
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(280.dp)
+                        .padding(top = Paddings.xlarge),
+                ) {
+                    Surface(
+                        modifier = Modifier
+                            .padding(top = Paddings.large)
+                            .fillMaxWidth()
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        shape = RoundedCornerShape(8.dp),
+                        shadowElevation = 4.dp
                     ) {
-                        Surface(
+                        Column(
                             modifier = Modifier
-                                .weight(1f),
-                            color = Color.White,
-                            shape = RoundedCornerShape(4.dp),
-                            shadowElevation = 2.dp
+                                .padding(horizontal = Paddings.medium)
+                                .padding(top = Paddings.extra, bottom = Paddings.medium),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(Paddings.medium)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(Paddings.medium),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            AnimatedVisibility(
+                                visible = paletteVisible == PaletteVisible.FULL,
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically()
                             ) {
-                                Box(modifier = Modifier) {
-                                    HsvColorPicker(
-                                        modifier = Modifier
-                                            .size(25.dp),
-                                        controller = colorPickerController,
-                                        drawDefaultWheelIndicator = false,
-                                        initialColor = drawingUiState.strokeColor
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .size(25.dp)
-                                            .clickable {
-                                                playSoundEffect(SoundEffect.BUTTON_CLICK)
-                                                openColorPickerDialog()
+                                Column(
+                                    modifier = Modifier,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(Paddings.medium)
+                                ) {
+                                    Row(
+                                        modifier = Modifier,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Surface(
+                                            modifier = Modifier
+                                                .weight(1f),
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(4.dp),
+                                            shadowElevation = 2.dp
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(Paddings.medium),
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Box(modifier = Modifier) {
+                                                    HsvColorPicker(
+                                                        modifier = Modifier
+                                                            .size(25.dp),
+                                                        controller = colorPickerController,
+                                                        drawDefaultWheelIndicator = false,
+                                                        initialColor = drawingUiState.strokeColor
+                                                    )
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(25.dp)
+                                                            .clickable {
+                                                                playSoundEffect(SoundEffect.BUTTON_CLICK)
+                                                                openColorPickerDialog()
+                                                            }
+                                                            .background(Color.White.copy(alpha = 0.3f))
+                                                    )
+                                                }
+
+                                                AlphaTile(
+                                                    modifier = Modifier
+                                                        .padding(top = Paddings.medium)
+                                                        .size(25.dp)
+                                                        .clip(RoundedCornerShape(6.dp)),
+                                                    controller = colorPickerController,
+                                                )
                                             }
-                                            .background(Color.White.copy(alpha = 0.3f))
+                                        }
+
+
+                                        Spacer(modifier = Modifier.size(10.dp))
+
+                                        Surface(
+                                            modifier = Modifier
+                                                .weight(4f),
+                                            color = Color.White,
+                                            shape = RoundedCornerShape(4.dp),
+                                            shadowElevation = 2.dp
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.padding(
+                                                    top = Paddings.small,
+                                                    bottom = Paddings.medium
+                                                ),
+                                                verticalArrangement = Arrangement.spacedBy(Paddings.small),
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier.padding(bottom = Paddings.medium),
+                                                    horizontalArrangement = Arrangement.spacedBy(
+                                                        Paddings.small
+                                                    )
+                                                ) {
+                                                    for (i in presetColorList.indices) {
+                                                        Surface(
+                                                            modifier = Modifier
+                                                                .size(5.dp),
+                                                            color = if (currentPreColorIndex == i) {
+                                                                MaterialTheme.colorScheme.primary
+                                                            } else {
+                                                                MaterialTheme.colorScheme.secondaryContainer
+                                                            },
+                                                            shape = RoundedCornerShape(50.dp),
+                                                            shadowElevation = 1.dp
+                                                        ) {}
+                                                    }
+                                                }
+                                                repeat(2) { i ->
+                                                    Row(
+                                                        horizontalArrangement = Arrangement.spacedBy(
+                                                            Paddings.medium
+                                                        ),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
+                                                        for (j in i * 6..i * 6 + 5) {
+                                                            Surface(
+                                                                modifier = Modifier
+                                                                    .size(25.dp)
+                                                                    .border(
+                                                                        3.dp,
+                                                                        presetColorList[currentPreColorIndex][j],
+                                                                        shape = RoundedCornerShape(
+                                                                            20.dp
+                                                                        )
+                                                                    )
+                                                                    .let {
+                                                                        if (drawingUiState.strokeColor == presetColorList[currentPreColorIndex][j]) {
+                                                                            it.padding(5.dp)
+                                                                        } else {
+                                                                            it
+                                                                        }
+                                                                    }
+                                                                    .clickable {
+                                                                        playSoundEffect(SoundEffect.BUTTON_CLICK)
+                                                                        colorPickerController.selectByColor(
+                                                                            presetColorList[currentPreColorIndex][j],
+                                                                            true
+                                                                        )
+                                                                    },
+                                                                color = presetColorList[currentPreColorIndex][j],
+                                                                shape = RoundedCornerShape(50.dp),
+                                                                shadowElevation = 1.dp
+                                                            ) {}
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    AlphaSlider(
+                                        modifier = Modifier
+                                            .padding(horizontal = Paddings.large)
+                                            .fillMaxWidth()
+                                            .height(15.dp),
+                                        controller = colorPickerController,
+                                        wheelRadius = 8.dp
+                                    )
+
+                                    BrightnessSlider(
+                                        modifier = Modifier
+                                            .padding(horizontal = Paddings.large)
+                                            .fillMaxWidth()
+                                            .height(15.dp),
+                                        controller = colorPickerController,
+                                        wheelRadius = 8.dp
                                     )
                                 }
+                            }
 
-                                AlphaTile(
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = Paddings.large),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
                                     modifier = Modifier
-                                        .padding(top = Paddings.medium)
-                                        .size(25.dp)
-                                        .clip(RoundedCornerShape(6.dp)),
-                                    controller = colorPickerController,
+                                        .size(20.dp),
+                                    painter = painterResource(
+                                        id = when (drawingUiState.actionType) {
+                                            ActionType.MOVE -> DesignSystemR.drawable.ic_hand
+                                            ActionType.BRUSH -> DesignSystemR.drawable.ic_brush
+                                            ActionType.ERASER -> DesignSystemR.drawable.ic_erase
+                                            ActionType.MAGIC_BRUSH -> DesignSystemR.drawable.ic_magic
+                                        }
+                                    ),
+                                    contentDescription = null
+                                )
+                                Slider(
+                                    modifier = Modifier.height(15.dp),
+                                    enabled = drawingUiState.actionType != ActionType.MOVE,
+                                    value = drawingUiState.strokeWidth,
+                                    onValueChange = { newValue ->
+                                        updateStrokeWidth(newValue)
+                                    },
+                                    valueRange = 5f..200f,
+                                    colors = SliderDefaults.colors(
+                                        thumbColor = drawingUiState.strokeColor,
+                                        activeTrackColor = drawingUiState.strokeColor,
+                                        inactiveTrackColor = Color.LightGray,
+                                        disabledActiveTrackColor = MaterialTheme.colorScheme.scrim,
+                                        disabledInactiveTrackColor = MaterialTheme.colorScheme.scrim,
+                                    )
                                 )
                             }
                         }
-
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Surface(
-                            modifier = Modifier
-                                .weight(4f),
-                            color = Color.White,
-                            shape = RoundedCornerShape(4.dp),
-                            shadowElevation = 2.dp
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(
-                                    top = Paddings.small,
-                                    bottom = Paddings.medium
-                                ),
-                                verticalArrangement = Arrangement.spacedBy(Paddings.small),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(bottom = Paddings.medium),
-                                    horizontalArrangement = Arrangement.spacedBy(Paddings.small)
-                                ) {
-                                    for (i in presetColorList.indices) {
-                                        Surface(
-                                            modifier = Modifier
-                                                .size(5.dp),
-                                            color = if (currentPreColorIndex == i) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                MaterialTheme.colorScheme.secondaryContainer
-                                            },
-                                            shape = RoundedCornerShape(50.dp),
-                                            shadowElevation = 1.dp
-                                        ) {}
-                                    }
-                                }
-                                repeat(2) { i ->
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(Paddings.medium),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        for (j in i * 6..i * 6 + 5) {
-                                            Surface(
-                                                modifier = Modifier
-                                                    .size(25.dp)
-                                                    .border(
-                                                        3.dp,
-                                                        presetColorList[currentPreColorIndex][j],
-                                                        shape = RoundedCornerShape(20.dp)
-                                                    )
-                                                    .let {
-                                                        if (drawingUiState.strokeColor == presetColorList[currentPreColorIndex][j]) {
-                                                            it.padding(5.dp)
-                                                        } else {
-                                                            it
-                                                        }
-                                                    }
-                                                    .clickable {
-                                                        playSoundEffect(SoundEffect.BUTTON_CLICK)
-                                                        colorPickerController.selectByColor(
-                                                            presetColorList[currentPreColorIndex][j],
-                                                            true
-                                                        )
-                                                    },
-                                                color = presetColorList[currentPreColorIndex][j],
-                                                shape = RoundedCornerShape(50.dp),
-                                                shadowElevation = 1.dp
-                                            ) {}
-                                        }
-                                    }
-                                }
-                            }
-                        }
                     }
-
-                    AlphaSlider(
-                        modifier = Modifier
-                            .padding(horizontal = Paddings.large)
-                            .fillMaxWidth()
-                            .height(15.dp),
-                        controller = colorPickerController,
-                        wheelRadius = 8.dp
-                    )
-
-                    BrightnessSlider(
-                        modifier = Modifier
-                            .padding(horizontal = Paddings.large)
-                            .fillMaxWidth()
-                            .height(15.dp),
-                        controller = colorPickerController,
-                        wheelRadius = 8.dp
-                    )
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Paddings.large),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
+                        val offsetMoveY by animateDpAsState(
+                            targetValue = if (drawingUiState.actionType == ActionType.MOVE) (-10).dp else 0.dp,
+                            label = "offsetMoveY"
+                        )
                         Image(
                             modifier = Modifier
-                                .size(20.dp),
-                            painter = painterResource(
-                                id = when (drawingUiState.actionType) {
-                                    ActionType.MOVE -> DesignSystemR.drawable.ic_hand
-                                    ActionType.BRUSH -> DesignSystemR.drawable.ic_brush
-                                    ActionType.ERASER -> DesignSystemR.drawable.ic_erase
-                                    ActionType.MAGIC_BRUSH -> DesignSystemR.drawable.ic_magic
-                                }
-                            ),
+                                .size(30.dp)
+                                .offset { IntOffset(0, offsetMoveY.roundToPx()) }
+                                .clickable {
+                                    playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                                    updateActionType(ActionType.MOVE)
+                                },
+                            painter = painterResource(id = DesignSystemR.drawable.ic_hand),
                             contentDescription = null
                         )
-                        Slider(
-                            modifier = Modifier.height(15.dp),
-                            enabled = drawingUiState.actionType != ActionType.MOVE,
-                            value = drawingUiState.strokeWidth,
-                            onValueChange = { newValue ->
-                                updateStrokeWidth(newValue)
-                            },
-                            valueRange = 5f..200f,
-                            colors = SliderDefaults.colors(
-                                thumbColor = drawingUiState.strokeColor,
-                                activeTrackColor = drawingUiState.strokeColor,
-                                inactiveTrackColor = Color.LightGray,
-                                disabledActiveTrackColor = MaterialTheme.colorScheme.scrim,
-                                disabledInactiveTrackColor = MaterialTheme.colorScheme.scrim,
-                            )
+                        val offsetBrushY by animateDpAsState(
+                            targetValue = if (drawingUiState.actionType == ActionType.BRUSH) (-10).dp else 0.dp,
+                            label = "offsetBrushY"
                         )
-                    }
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                val offsetMoveY by animateDpAsState(
-                    targetValue = if (drawingUiState.actionType == ActionType.MOVE) (-10).dp else 0.dp,
-                    label = "offsetMoveY"
-                )
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .offset { IntOffset(0, offsetMoveY.roundToPx()) }
-                        .clickable {
-                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
-                            updateActionType(ActionType.MOVE)
-                        },
-                    painter = painterResource(id = DesignSystemR.drawable.ic_hand),
-                    contentDescription = null
-                )
-                val offsetBrushY by animateDpAsState(
-                    targetValue = if (drawingUiState.actionType == ActionType.BRUSH) (-10).dp else 0.dp,
-                    label = "offsetBrushY"
-                )
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .offset { IntOffset(0, offsetBrushY.roundToPx()) }
-                        .clickable {
-                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
-                            updateActionType(ActionType.BRUSH)
-                        },
-                    painter = painterResource(id = DesignSystemR.drawable.ic_brush),
-                    contentDescription = null
-                )
-                val offsetEraserY by animateDpAsState(
-                    targetValue = if (drawingUiState.actionType == ActionType.ERASER) (-10).dp else 0.dp,
-                    label = "offsetEraserY"
-                )
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .offset { IntOffset(0, offsetEraserY.roundToPx()) }
-                        .clickable {
-                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
-                            updateActionType(ActionType.ERASER)
-                        },
-                    painter = painterResource(id = DesignSystemR.drawable.ic_erase),
-                    contentDescription = null
-                )
-                val offsetMagicBrushY by animateDpAsState(
-                    targetValue = if (drawingUiState.actionType == ActionType.MAGIC_BRUSH) (-10).dp else 0.dp,
-                    label = "offsetMagicBrushY"
-                )
-                Box(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .offset { IntOffset(0, offsetMagicBrushY.roundToPx()) }
-                        .clickable {
-                            playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
-                            if (drawingUiState.hasMagicBrush) {
-                                updateActionType(ActionType.MAGIC_BRUSH)
-                            } else {
-                                // 광고
-                                updateMagicBrushState()
+                        Image(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .offset { IntOffset(0, offsetBrushY.roundToPx()) }
+                                .clickable {
+                                    playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                                    updateActionType(ActionType.BRUSH)
+                                },
+                            painter = painterResource(id = DesignSystemR.drawable.ic_brush),
+                            contentDescription = null
+                        )
+                        val offsetEraserY by animateDpAsState(
+                            targetValue = if (drawingUiState.actionType == ActionType.ERASER) (-10).dp else 0.dp,
+                            label = "offsetEraserY"
+                        )
+                        Image(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .offset { IntOffset(0, offsetEraserY.roundToPx()) }
+                                .clickable {
+                                    playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                                    updateActionType(ActionType.ERASER)
+                                },
+                            painter = painterResource(id = DesignSystemR.drawable.ic_erase),
+                            contentDescription = null
+                        )
+                        val offsetMagicBrushY by animateDpAsState(
+                            targetValue = if (drawingUiState.actionType == ActionType.MAGIC_BRUSH) (-10).dp else 0.dp,
+                            label = "offsetMagicBrushY"
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .offset { IntOffset(0, offsetMagicBrushY.roundToPx()) }
+                                .clickable {
+                                    playSoundEffect(SoundEffect.SELECT_DRAWING_ACTION_TYPE)
+                                    if (drawingUiState.hasMagicBrush) {
+                                        updateActionType(ActionType.MAGIC_BRUSH)
+                                    } else {
+                                        // 광고
+                                        updateMagicBrushState()
+                                    }
+                                }
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                painter = painterResource(id = DesignSystemR.drawable.ic_magic),
+                                contentDescription = null
+                            )
+                            if (!drawingUiState.hasMagicBrush) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(15.dp)
+                                        .align(Alignment.BottomEnd),
+                                    painter = painterResource(id = DesignSystemR.drawable.ic_lock),
+                                    contentDescription = null
+                                )
                             }
                         }
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(),
-                        painter = painterResource(id = DesignSystemR.drawable.ic_magic),
-                        contentDescription = null
-                    )
-                    if (!drawingUiState.hasMagicBrush) {
-                        Image(
-                            modifier = Modifier
-                                .size(15.dp)
-                                .align(Alignment.BottomEnd),
-                            painter = painterResource(id = DesignSystemR.drawable.ic_lock),
-                            contentDescription = null
-                        )
                     }
+                }
+
+                AnimatedVisibility(
+                    visible = paletteVisible == PaletteVisible.FULL,
+                    enter = slideInHorizontally(initialOffsetX = { it }) + fadeIn(),
+                    exit = slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+                ) {
+                    DrawingUiButton(
+                        modifier = Modifier
+                            .padding(start = Paddings.medium)
+                            .size(30.dp),
+                        painter = painterResource(id = DesignSystemR.drawable.ic_right),
+                        playSoundEffect = playSoundEffect,
+                        onClick = {
+                            if (currentPreColorIndex == presetColorList.size - 1) {
+                                currentPreColorIndex = 0
+                            } else {
+                                currentPreColorIndex += 1
+                            }
+                        }
+                    )
                 }
             }
         }
-
-        DrawingUiButton(
-            modifier = Modifier
-                .padding(start = Paddings.medium)
-                .size(30.dp),
-            painter = painterResource(id = DesignSystemR.drawable.ic_right),
-            playSoundEffect = playSoundEffect,
-            onClick = {
-                if (currentPreColorIndex == presetColorList.size - 1) {
-                    currentPreColorIndex = 0
-                } else {
-                    currentPreColorIndex += 1
-                }
-            }
-        )
     }
 }
 
@@ -671,7 +752,8 @@ fun DrawingPalettePreview() {
             openColorPickerDialog = {},
             updateActionType = {},
             updateStrokeWidth = {},
-            updateMagicBrushState = {}
+            updateMagicBrushState = {},
+            initOffset = {}
         )
     }
 }

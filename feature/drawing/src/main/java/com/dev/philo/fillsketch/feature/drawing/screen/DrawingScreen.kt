@@ -1,10 +1,5 @@
 package com.dev.philo.fillsketch.feature.drawing.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -35,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
@@ -140,7 +136,6 @@ fun DrawingContent(
     ) {
         var scale by remember { mutableFloatStateOf(1f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
-        var paletteVisible by remember { mutableStateOf(true) }
         var resetDialogVisible by remember { mutableStateOf(false) }
 
         val minScale = 0.6f
@@ -233,61 +228,23 @@ fun DrawingContent(
             )
         }
 
-        Column(
+        DrawingPalette(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = Paddings.large),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = Paddings.large)
-                    .fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    verticalArrangement = Arrangement.spacedBy(Paddings.large)
-                ) {
-                    DrawingUiButton(
-                        modifier = Modifier.size(30.dp),
-                        playSoundEffect = playSoundEffect,
-                        painter = if (paletteVisible) {
-                            painterResource(id = DesignSystemR.drawable.ic_hide_down)
-                        } else {
-                            painterResource(id = DesignSystemR.drawable.ic_hide_up)
-                        },
-                        onClick = {
-                            paletteVisible = !paletteVisible
-                        }
-                    )
-                    DrawingUiButton(
-                        modifier = Modifier.size(30.dp),
-                        playSoundEffect = playSoundEffect,
-                        painter = painterResource(id = DesignSystemR.drawable.ic_screen),
-                        onClick = {
-                            offset = Offset.Zero
-                            scale = 1f
-                        }
-                    )
-                }
+                .padding(bottom = Paddings.large)
+                .fillMaxWidth(),
+            drawingUiState = drawingUiState,
+            playSoundEffect = playSoundEffect,
+            colorPickerController = colorPickerController,
+            openColorPickerDialog = { colorPaletteDialog = true },
+            updateActionType = updateActionType,
+            updateStrokeWidth = updateStrokeWidth,
+            updateMagicBrushState = updateMagicBrushState,
+            initOffset = {
+                offset = Offset.Zero
+                scale = 1f
             }
-
-            AnimatedVisibility(
-                visible = paletteVisible,
-                enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
-                exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
-            ) {
-                DrawingPalette(
-                    drawingUiState = drawingUiState,
-                    playSoundEffect = playSoundEffect,
-                    colorPickerController = colorPickerController,
-                    openColorPickerDialog = { colorPaletteDialog = true },
-                    updateActionType = updateActionType,
-                    updateStrokeWidth = updateStrokeWidth,
-                    updateMagicBrushState = updateMagicBrushState,
-                )
-            }
-        }
+        )
 
         if (resetDialogVisible) {
             FillSketchDialog(
@@ -418,6 +375,8 @@ fun DrawingContentPreview() {
     FillSketchTheme {
         DrawingContent(
             drawingUiState = DrawingUiState(
+                currentResultBitmap = ImageBitmap.imageResource(id = SketchResource.sketchRecommendResourceIds[0])
+                    .asAndroidBitmap(),
                 width = 1024,
                 height = 1536
             ),

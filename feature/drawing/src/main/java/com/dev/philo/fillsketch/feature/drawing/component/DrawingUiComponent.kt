@@ -437,7 +437,7 @@ fun DrawingPalette(
                                     updateActionType(ActionType.MOVE)
                                 },
                             painter = painterResource(id = DesignSystemR.drawable.ic_hand),
-                            contentDescription = null
+                            contentDescription = null,
                         )
                         val offsetBrushY by animateDpAsState(
                             targetValue = if (drawingUiState.actionType == ActionType.BRUSH) (-10).dp else 0.dp,

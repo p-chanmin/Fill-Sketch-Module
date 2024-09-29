@@ -53,6 +53,7 @@ import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.ActionType
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.drawing.component.CheckeredBackgroundBox
 import com.dev.philo.fillsketch.feature.drawing.component.ColorPickerDialog
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingPalette
 import com.dev.philo.fillsketch.feature.drawing.component.DrawingUiButton
@@ -315,8 +316,8 @@ fun DrawingCanvas(
                     }
                 }
             }
-            .background(MaterialTheme.colorScheme.scrim)
     ) {
+        CheckeredBackgroundBox(tileSize = 70.dp)
         Box(
             modifier = Modifier
                 .align(Alignment.Center)

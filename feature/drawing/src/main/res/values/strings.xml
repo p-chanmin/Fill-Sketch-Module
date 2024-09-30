@@ -6,4 +6,5 @@
     <string name="feature_drawing_download_complete">Download Complete !</string>
     <string name="feature_drawing_move_to_myworks">Move To MyWorks</string>
     <string name="feature_drawing_color_palette">Color Palette</string>
+    <string name="feature_drawing_ad_load_fail">Please check your internet connection and try again</string>
 </resources>

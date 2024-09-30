@@ -25,7 +25,9 @@ fun NavGraphBuilder.drawingNavGraph(
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit,
-    navigateToMyWorks: () -> Unit
+    navigateToMyWorks: () -> Unit,
+    showMagicRewardAd: (() -> Unit, () -> Unit) -> Unit,
+    showInterstitialRewardAd: () -> Unit,
 ) {
     composable<Route.Drawing> { navBackStackEntry ->
         val (sketchType, drawingResultId) = navBackStackEntry.toRoute<Route.Drawing>()
@@ -36,6 +38,7 @@ fun NavGraphBuilder.drawingNavGraph(
             onShowErrorSnackBar = onShowErrorSnackBar,
             onBackClick = onBackClick,
             navigateToDrawingResult = navigateToDrawingResult,
+            showMagicRewardAd = showMagicRewardAd,
             playSoundEffect = playSoundEffect,
         )
     }
@@ -51,6 +54,7 @@ fun NavGraphBuilder.drawingNavGraph(
             navigateToDrawing = navigateToDrawing,
             navigateToMyWorks = navigateToMyWorks,
             playSoundEffect = playSoundEffect,
+            showInterstitialRewardAd = showInterstitialRewardAd,
         )
     }
 }

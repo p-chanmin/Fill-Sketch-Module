@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,6 +69,7 @@ fun SketchListScreen(
     onBackClick: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
+    showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,
     sketchListViewModel: SketchListViewModel = hiltViewModel()
 ) {
 
@@ -94,6 +96,7 @@ fun SketchListScreen(
         deleteMyWork = sketchListViewModel::deleteMyWork,
         dismissDialog = sketchListViewModel::dismissDialog,
         playSoundEffect = playSoundEffect,
+        showSketchRewardAd = showSketchRewardAd,
     )
 
 }
@@ -110,8 +113,9 @@ fun SketchListContent(
     deleteMyWork: (Int, Int) -> Unit,
     dismissDialog: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
+    showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,
 ) {
-
+    val context = LocalContext.current
     val lazyGridState = rememberLazyGridState()
 
     Column(
@@ -149,7 +153,8 @@ fun SketchListContent(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Paddings.extra),
+                .padding(Paddings.extra)
+                .padding(bottom = 60.dp),
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 4.dp,
             color = MaterialTheme.colorScheme.secondary
@@ -302,8 +307,10 @@ fun SketchListContent(
                         painter = painterResource(id = DesignSystemR.drawable.ic_ads),
                         text = stringResource(R.string.feature_home_watch_ad),
                         onClick = {
-                            // 광고 보기
-                            unlockSketch(sketchListUiState.selectedSketchId)
+                            showSketchRewardAd(
+                                { unlockSketch(sketchListUiState.selectedSketchId) },
+                                { onShowErrorSnackBar(context.getString(R.string.feature_home_ad_load_fail)) }
+                            )
                             dismissDialog()
                         }
                     )
@@ -342,14 +349,15 @@ fun SketchListContentPreview() {
                     MyWork(1, 0),
                     MyWork(2, 0),
                 ),
-                dialogUnlockVisible = true,
+                dialogUnlockVisible = false,
                 dialogMyWorksVisible = false
             ),
             selectSketch = { _, _, _, _ -> },
             unlockSketch = {},
             addMyWork = { _, _, _, _ -> },
             deleteMyWork = { _, _ -> },
-            dismissDialog = {}
+            dismissDialog = {},
+            showSketchRewardAd = { _, _ -> }
         )
     }
 }

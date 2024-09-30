@@ -27,4 +27,5 @@
     <string name="feature_home_privacy_policy_uri">https://sites.google.com/view/fill-sketch-privacy-policy</string>
     <string name="feature_home_terms_of_service_uri">https://sites.google.com/view/fill-sketch-terms-of-service</string>
     <string name="feature_home_source_support_uri">https://sites.google.com/view/fill-sketch-source</string>
+    <string name="feature_home_ad_load_fail">Please check your internet connection and try again</string>
 </resources>

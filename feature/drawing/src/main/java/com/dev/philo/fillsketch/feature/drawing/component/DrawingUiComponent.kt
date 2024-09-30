@@ -175,7 +175,7 @@ fun DrawingPalette(
             exit = slideOutVertically(targetOffsetY = { it }) + fadeOut()
         ) {
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -484,7 +484,6 @@ fun DrawingPalette(
                                     if (drawingUiState.hasMagicBrush) {
                                         updateActionType(ActionType.MAGIC_BRUSH)
                                     } else {
-                                        // 광고
                                         updateMagicBrushState()
                                     }
                                 }

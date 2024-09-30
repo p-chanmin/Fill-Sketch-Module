@@ -24,6 +24,8 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 add("implementation", libs.findLibrary("androidx.compose.navigation").get())
                 add("androidTestImplementation", libs.findLibrary("androidx.compose.navigation.test").get())
 
+                add("implementation", libs.findLibrary("play.services.ads").get())
+
                 add("implementation", project(":core:model"))
                 add("implementation", project(":core:designsystem"))
                 add("implementation", project(":core:navigation"))

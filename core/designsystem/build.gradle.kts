@@ -8,7 +8,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.coil.compose)
     implementation(project(":asset"))
     implementation(project(":core:model"))
 }

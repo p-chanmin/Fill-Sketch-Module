@@ -20,17 +20,18 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
+gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))
 rootProject.name = "Fill Sketch"
 include(":app")
 
-include(":feature:main")
+include(":asset")
 
 include(":core:model")
 include(":core:designsystem")
 include(":core:navigation")
-include(":feature:home")
-include(":feature:drawing")
-include(":asset")
 include(":core:database")
 include(":core:data")
+
+include(":feature:main")
+include(":feature:home")
+include(":feature:drawing")

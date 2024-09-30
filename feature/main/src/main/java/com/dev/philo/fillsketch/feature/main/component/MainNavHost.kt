@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.navigation.drawingNavGraph
 import com.dev.philo.fillsketch.feature.home.navigation.homeNavGraph
+import com.dev.philo.fillsketch.feature.main.AdMobManager
 import com.dev.philo.fillsketch.feature.main.MainNavigator
 
 @Composable
@@ -16,6 +17,7 @@ internal fun MainNavHost(
     padding: PaddingValues,
     playSoundEffect: (SoundEffect) -> Unit = {},
     onShowErrorSnackBar: (String) -> Unit,
+    adMobManager: AdMobManager,
 ) {
     NavHost(
         navController = navigator.navController,
@@ -41,7 +43,8 @@ internal fun MainNavHost(
                     sketchType,
                     drawingResultId
                 )
-            }
+            },
+            showSketchRewardAd = adMobManager::showSketchRewardAd
         )
 
         drawingNavGraph(
@@ -61,7 +64,9 @@ internal fun MainNavHost(
                     drawingResultId
                 )
             },
-            navigateToMyWorks = { navigator.navigateToMyWorks() }
+            navigateToMyWorks = { navigator.navigateToMyWorks() },
+            showMagicRewardAd = adMobManager::showMagicRewardAd,
+            showInterstitialRewardAd = adMobManager::showInterstitialRewardAd
         )
     }
 }

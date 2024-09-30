@@ -26,7 +26,8 @@ fun NavGraphBuilder.homeNavGraph(
     navigateToSketchList: () -> Unit,
     navigateToMyWorks: () -> Unit,
     navigateToDrawing: (Int, Int) -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit
+    navigateToDrawingResult: (Int, Int) -> Unit,
+    showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,
 ) {
     composable<Route.Home> {
         HomeScreen(
@@ -45,6 +46,7 @@ fun NavGraphBuilder.homeNavGraph(
             onBackClick = onBackClick,
             navigateToDrawing = navigateToDrawing,
             playSoundEffect = playSoundEffect,
+            showSketchRewardAd = showSketchRewardAd,
         )
     }
 

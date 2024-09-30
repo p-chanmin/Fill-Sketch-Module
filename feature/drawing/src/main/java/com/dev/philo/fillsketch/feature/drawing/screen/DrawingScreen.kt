@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +74,7 @@ fun DrawingScreen(
     onBackClick: () -> Unit,
     navigateToDrawingResult: (Int, Int) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
+    showMagicRewardAd: (() -> Unit, () -> Unit) -> Unit,
     drawingViewModel: DrawingViewModel = hiltViewModel()
 ) {
 
@@ -95,6 +97,7 @@ fun DrawingScreen(
     DrawingContent(
         modifier = Modifier.fillMaxSize(),
         drawingUiState = drawingUiState,
+        onShowErrorSnackBar = onShowErrorSnackBar,
         redoPathSize = drawingViewModel.redoPathSize,
         undoPathSize = drawingViewModel.undoPathSize,
         insertNewPath = drawingViewModel::insertNewPath,
@@ -110,6 +113,7 @@ fun DrawingScreen(
         onBackClick = onBackClick,
         navigateToDrawingResult = { navigateToDrawingResult(sketchType, drawingResultId) },
         playSoundEffect = playSoundEffect,
+        showMagicRewardAd = showMagicRewardAd,
     )
 }
 
@@ -117,6 +121,7 @@ fun DrawingScreen(
 fun DrawingContent(
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
+    onShowErrorSnackBar: (message: String) -> Unit,
     redoPathSize: Int,
     undoPathSize: Int,
     insertNewPath: (Offset) -> Unit,
@@ -132,10 +137,12 @@ fun DrawingContent(
     onBackClick: () -> Unit,
     navigateToDrawingResult: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
+    showMagicRewardAd: (() -> Unit, () -> Unit) -> Unit,
 ) {
     Box(
         modifier = modifier
     ) {
+        val context = LocalContext.current
         var scale by remember { mutableFloatStateOf(1f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
         var resetDialogVisible by remember { mutableStateOf(false) }
@@ -233,7 +240,7 @@ fun DrawingContent(
         DrawingPalette(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = Paddings.large)
+                .padding(bottom = Paddings.large + 60.dp)
                 .fillMaxWidth(),
             drawingUiState = drawingUiState,
             playSoundEffect = playSoundEffect,
@@ -241,7 +248,12 @@ fun DrawingContent(
             openColorPickerDialog = { colorPaletteDialog = true },
             updateActionType = updateActionType,
             updateStrokeWidth = updateStrokeWidth,
-            updateMagicBrushState = updateMagicBrushState,
+            updateMagicBrushState = {
+                showMagicRewardAd(
+                    { updateMagicBrushState() },
+                    { onShowErrorSnackBar(context.getString(R.string.feature_drawing_ad_load_fail)) }
+                )
+            },
             initOffset = {
                 offset = Offset.Zero
                 scale = 1f
@@ -382,6 +394,7 @@ fun DrawingContentPreview() {
                 width = 1024,
                 height = 1536
             ),
+            onShowErrorSnackBar = {},
             redoPathSize = 10,
             undoPathSize = 10,
             insertNewPath = { },
@@ -396,6 +409,7 @@ fun DrawingContentPreview() {
             updateMagicBrushState = { },
             onBackClick = { },
             navigateToDrawingResult = { },
+            showMagicRewardAd = { _, _ -> }
         )
     }
 }

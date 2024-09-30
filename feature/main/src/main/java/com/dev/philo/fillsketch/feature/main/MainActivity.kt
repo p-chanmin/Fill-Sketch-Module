@@ -4,10 +4,12 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.SoundPool
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.material3.Button
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,7 +17,15 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import com.dev.philo.fillsketch.asset.R as AssetR
 
 @AndroidEntryPoint
@@ -41,11 +51,17 @@ class MainActivity : ComponentActivity() {
             .build()
 
         soundPool = SoundPool.Builder()
-            .setMaxStreams(5)
+            .setMaxStreams(10)
             .setAudioAttributes(audioAttributes)
             .build()
 
         val soundEffectManager = SoundEffectManager(this, soundPool)
+
+        val backgroundScope = CoroutineScope(Dispatchers.IO)
+        backgroundScope.launch {
+            MobileAds.initialize(this@MainActivity)
+        }
+        val adMobManager = AdMobManager(this)
 
         setContent {
             val navigator: MainNavigator = rememberMainNavigator()
@@ -72,7 +88,8 @@ class MainActivity : ComponentActivity() {
             FillSketchTheme {
                 MainScreen(
                     navigator = navigator,
-                    playSoundEffect = playSoundEffect
+                    playSoundEffect = playSoundEffect,
+                    adMobManager = adMobManager
                 )
             }
         }

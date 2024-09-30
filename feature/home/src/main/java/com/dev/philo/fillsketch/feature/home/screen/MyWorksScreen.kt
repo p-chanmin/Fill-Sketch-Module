@@ -118,7 +118,8 @@ fun MyWorksContent(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(Paddings.extra),
+                .padding(Paddings.extra)
+                .padding(bottom = 60.dp),
             shape = RoundedCornerShape(20.dp),
             shadowElevation = 4.dp,
             color = MaterialTheme.colorScheme.secondary

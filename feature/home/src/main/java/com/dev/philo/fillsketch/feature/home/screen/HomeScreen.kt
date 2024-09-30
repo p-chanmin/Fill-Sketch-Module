@@ -218,35 +218,36 @@ fun HomeContent(
 
         Column(
             modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = Paddings.large),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            FillSketchMainButton(
+                modifier = Modifier.size(100.dp),
+                playSoundEffect = playSoundEffect,
+                painter = painterResource(id = AssetR.drawable.img_sketch),
+                badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
+                onClick = {}
+            )
+
+            FillSketchMainButton(
+                modifier = Modifier.size(100.dp),
+                playSoundEffect = playSoundEffect,
+                painter = painterResource(id = AssetR.drawable.img_sketch),
+                badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
+                onClick = {}
+            )
+        }
+
+        Column(
+            modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
         ) {
-
-            Column(
-                modifier = Modifier.padding(bottom = Paddings.extra, start = Paddings.large),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
-            ) {
-                FillSketchMainButton(
-                    modifier = Modifier.size(100.dp),
-                    playSoundEffect = playSoundEffect,
-                    painter = painterResource(id = AssetR.drawable.img_sketch),
-                    badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
-                    onClick = {}
-                )
-
-                FillSketchMainButton(
-                    modifier = Modifier.size(100.dp),
-                    playSoundEffect = playSoundEffect,
-                    painter = painterResource(id = AssetR.drawable.img_sketch),
-                    badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
-                    onClick = {}
-                )
-            }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = Paddings.xlarge),
+                    .padding(bottom = Paddings.xlarge + 60.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 FillSketchMainButton(

@@ -63,6 +63,7 @@ fun DrawingResultScreen(
     navigateToDrawing: (Int, Int) -> Unit,
     navigateToMyWorks: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
+    showInterstitialRewardAd: () -> Unit,
     drawingResultViewModel: DrawingResultViewModel = hiltViewModel()
 ) {
 
@@ -124,7 +125,7 @@ fun DrawingResultScreen(
                         }
                     }
                 }
-
+                showInterstitialRewardAd()
                 drawingResultViewModel.updateSaveCompleteDialogVisible(true)
             }
         }
@@ -268,7 +269,7 @@ fun DrawingResultContentPreview() {
             dismissSaveCompleteDialog = {},
             onBackClick = {},
             saveDrawingResult = {},
-            navigateToMyWorks = {}
+            navigateToMyWorks = {},
         )
     }
 }

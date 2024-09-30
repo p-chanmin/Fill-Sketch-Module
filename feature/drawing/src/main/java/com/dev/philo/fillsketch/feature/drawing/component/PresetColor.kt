@@ -5,18 +5,18 @@ import androidx.compose.ui.graphics.Color
 val presetColorList = listOf(
     // 베이스 색상 1: 핑크 계열
     listOf(
-        Color(0xFFFDECE2),
-        Color(0xFFFFE0D6),
-        Color(0xFFFFF1E8),
-        Color(0xFFFFD8CC),
-        Color(0xFFFFEDE1),
-        Color(0xFFFFF6EF),
-        Color(0xFFF9E3D9),
-        Color(0xFFF7D9CF),
-        Color(0xFFFFF0E6),
-        Color(0xFFFCE5DB),
-        Color(0xFFFFDBCD),
-        Color(0xFFF7DFD4)
+        Color(0xFFFDECE2), // 기준 색상 (FDECE2)
+        Color(0xFFFDF1E6), // 비슷한 색상 1
+        Color(0xFFFDF6EB), // 비슷한 색상 2
+        Color(0xFFFFE8E3), // 비슷한 색상 3
+        Color(0xFFFFD5D1), // 비슷한 색상 4
+        Color(0xFFFFB2B0), // 비슷한 색상 5
+        Color(0xFFFF9998), // 비슷한 색상 6
+        Color(0xFFFF7F7F), // 비슷한 색상 7
+        Color(0xFF6B4E4E), // 보색 1 (갈색 계열)
+        Color(0xFF7D5B5B), // 보색 2 (갈색 계열)
+        Color(0xFF8F6868), // 보색 3 (갈색 계열)
+        Color(0xFFA57C7C)   // 보색 4 (갈색 계열)
     ),
     // 베이스 색상 2: 빨간색 계열
     listOf(

@@ -45,10 +45,9 @@ fun FillSketchMainButton(
 ) {
     Surface(
         modifier = modifier
-            .border(2.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp))
-            .padding(5.dp),
+            .border(2.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(8.dp)),
         color = MaterialTheme.colorScheme.primary,
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(8.dp),
         shadowElevation = 2.dp,
     ) {
         Box(

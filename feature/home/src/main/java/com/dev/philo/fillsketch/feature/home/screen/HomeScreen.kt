@@ -53,6 +53,7 @@ import com.dev.philo.fillsketch.core.designsystem.component.OutlinedText
 import com.dev.philo.fillsketch.core.designsystem.theme.FillSketchTheme
 import com.dev.philo.fillsketch.core.designsystem.theme.Paddings
 import com.dev.philo.fillsketch.core.model.SoundEffect
+import com.dev.philo.fillsketch.feature.home.BuildConfig
 import com.dev.philo.fillsketch.feature.home.R
 import com.dev.philo.fillsketch.feature.home.model.HomeUiState
 import com.dev.philo.fillsketch.feature.home.viewmodel.HomeViewModel
@@ -225,17 +226,37 @@ fun HomeContent(
             FillSketchMainButton(
                 modifier = Modifier.size(100.dp),
                 playSoundEffect = playSoundEffect,
-                painter = painterResource(id = AssetR.drawable.img_sketch),
+                painter = painterResource(id = AssetR.drawable.ad_other_version_icon_01),
                 badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
-                onClick = {}
+                onClick = {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(
+                                context.getString(
+                                    R.string.feature_home_play_store_uri,
+                                    BuildConfig.RECOMMEND_OTHER_VERSION_1
+                                )
+                            )
+                        )
+                    )
+                }
             )
 
             FillSketchMainButton(
                 modifier = Modifier.size(100.dp),
                 playSoundEffect = playSoundEffect,
-                painter = painterResource(id = AssetR.drawable.img_sketch),
+                painter = painterResource(id = AssetR.drawable.ad_other_version_icon_02),
                 badge = painterResource(id = DesignSystemR.drawable.ic_playstore),
-                onClick = {}
+                onClick = {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(
+                            context.getString(
+                                R.string.feature_home_play_store_uri,
+                                BuildConfig.RECOMMEND_OTHER_VERSION_2
+                            )
+                        )
+                        )
+                    )
+                }
             )
         }
 
@@ -376,7 +397,6 @@ fun SettingDialog(
             }
             HorizontalDivider(
                 modifier = Modifier.padding(horizontal = Paddings.large),
-                color = MaterialTheme.colorScheme.primary
             )
             Row(
                 modifier = Modifier

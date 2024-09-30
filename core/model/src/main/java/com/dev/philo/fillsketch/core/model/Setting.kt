@@ -7,6 +7,5 @@ data class Setting(
 
 enum class SoundEffect {
     BUTTON_CLICK,
-    DRAWING,
     SELECT_DRAWING_ACTION_TYPE
 }

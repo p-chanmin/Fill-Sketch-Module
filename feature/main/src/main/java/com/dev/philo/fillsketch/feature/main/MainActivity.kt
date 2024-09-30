@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         soundPool = SoundPool.Builder()
-            .setMaxStreams(10)
+            .setMaxStreams(2)
             .setAudioAttributes(audioAttributes)
             .build()
 

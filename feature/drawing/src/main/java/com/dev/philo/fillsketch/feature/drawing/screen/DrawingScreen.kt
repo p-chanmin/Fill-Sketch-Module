@@ -161,7 +161,6 @@ fun DrawingContent(
             insertNewPath = insertNewPath,
             updateLatestPath = updateLatestPath,
             drawOnNewMask = drawOnNewMask,
-            playSoundEffect = playSoundEffect,
         )
 
         Row(
@@ -315,7 +314,6 @@ fun DrawingCanvas(
     insertNewPath: (Offset) -> Unit,
     updateLatestPath: (Offset) -> Unit,
     drawOnNewMask: () -> Unit,
-    playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -355,7 +353,6 @@ fun DrawingCanvas(
                                         drawingUiState.width * start.position.x / canvasSize.width,
                                         drawingUiState.height * start.position.y / canvasSize.height
                                     )
-                                    playSoundEffect(SoundEffect.DRAWING)
                                     insertNewPath(startOffset)
                                     updateLatestPath(startOffset)
 
@@ -365,7 +362,6 @@ fun DrawingCanvas(
                                             drawingUiState.height * change.position.y / canvasSize.height
                                         )
                                         change.consume()
-                                        playSoundEffect(SoundEffect.DRAWING)
                                         updateLatestPath(calculatedOffset)
                                     }
                                     drawOnNewMask()

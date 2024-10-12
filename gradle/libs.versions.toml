@@ -20,8 +20,8 @@ androidxComposeBom = "2024.06.00"
 androidxComposeNavigation = "2.8.0-beta02"
 androidxComposeMaterial3 = "1.2.1"
 
-## RealmDB
-realmDB = "2.0.0"
+## Room
+room = "2.6.1"
 
 ## ColorPicker
 colorpicker = "1.1.2"
@@ -93,8 +93,9 @@ coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutine" }
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutine" }
 
-realm-library-base = { group = "io.realm.kotlin", name = "library-base", version.ref = "realmDB" }
-realm-library-sync = { group = "io.realm.kotlin", name = "library-sync", version.ref = "realmDB" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
@@ -116,4 +117,3 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-realm-database = { id = "io.realm.kotlin", version.ref = "realmDB" }

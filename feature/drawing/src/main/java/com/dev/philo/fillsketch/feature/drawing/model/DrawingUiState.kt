@@ -8,7 +8,7 @@ import com.dev.philo.fillsketch.feature.drawing.component.presetColorList
 
 @Immutable
 data class DrawingUiState(
-    val drawingResultId: Int = 0,
+    val drawingResultId: Long = 0,
     val sketchType: Int = 0,
     val width: Int = 0,
     val height: Int = 0,

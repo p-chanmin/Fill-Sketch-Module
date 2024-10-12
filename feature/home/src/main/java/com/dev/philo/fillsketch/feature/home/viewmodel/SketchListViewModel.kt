@@ -113,7 +113,7 @@ class SketchListViewModel @Inject constructor(
         }
     }
 
-    fun deleteMyWork(sketchType: Int, drawingResultId: Int) {
+    fun deleteMyWork(sketchType: Int, drawingResultId: Long) {
         viewModelScope.launch {
             sketchRepository.deleteDrawingResult(drawingResultId)
             _sketchListUiState.update {

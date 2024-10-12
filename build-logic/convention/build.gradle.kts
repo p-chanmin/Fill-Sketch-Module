@@ -55,9 +55,9 @@ gradlePlugin {
             implementationClass = "AndroidKotlinSerializationConventionPlugin"
         }
 
-        register("androidRealm") {
-            id = "philo.fillsketch.android.realm"
-            implementationClass = "AndroidRealmConventionPlugin"
+        register("androidRoom") {
+            id = "philo.fillsketch.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
 
         register("androidGson") {

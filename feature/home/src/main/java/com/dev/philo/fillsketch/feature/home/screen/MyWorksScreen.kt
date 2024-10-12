@@ -58,7 +58,7 @@ fun MyWorksScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit,
+    navigateToDrawingResult: (Int, Long) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
     myWorksViewModel: MyWorksViewModel = hiltViewModel()
 ) {
@@ -77,8 +77,8 @@ fun MyWorksScreen(
 fun MyWorksContent(
     myWorksUiState: MyWorksUiState,
     onBackClick: () -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit,
-    deleteMyWork: (Int) -> Unit,
+    navigateToDrawingResult: (Int, Long) -> Unit,
+    deleteMyWork: (Long) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
 ) {
     val lazyGridState = rememberLazyGridState()

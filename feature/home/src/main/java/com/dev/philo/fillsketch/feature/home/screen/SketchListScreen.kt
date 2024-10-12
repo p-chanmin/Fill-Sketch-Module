@@ -67,7 +67,7 @@ fun SketchListScreen(
     paddingValues: PaddingValues,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: (Int, Int) -> Unit,
+    navigateToDrawing: (Int, Long) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
     showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,
     sketchListViewModel: SketchListViewModel = hiltViewModel()
@@ -105,12 +105,12 @@ fun SketchListScreen(
 fun SketchListContent(
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: (Int, Int) -> Unit,
+    navigateToDrawing: (Int, Long) -> Unit,
     sketchListUiState: SketchListUiState = SketchListUiState(),
     selectSketch: (Int, Int, Int, Int) -> Unit,
     unlockSketch: (Int) -> Unit,
     addMyWork: (Int, Int, Int, Int) -> Unit,
-    deleteMyWork: (Int, Int) -> Unit,
+    deleteMyWork: (Int, Long) -> Unit,
     dismissDialog: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
     showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,

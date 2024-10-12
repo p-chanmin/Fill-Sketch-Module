@@ -63,7 +63,7 @@ class DrawingViewModel @Inject constructor(
 
     fun fetchDrawingUiState(
         sketchType: Int,
-        drawingResultId: Int,
+        drawingResultId: Long,
         recommendImageBitmap: ImageBitmap,
         outlineImageBitmap: ImageBitmap,
     ) {

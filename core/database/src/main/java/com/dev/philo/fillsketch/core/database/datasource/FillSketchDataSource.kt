@@ -1,109 +1,91 @@
 package com.dev.philo.fillsketch.core.database.datasource
 
-import com.dev.philo.fillsketch.core.database.schema.DrawingResultSchema
-import com.dev.philo.fillsketch.core.database.schema.SettingSchema
-import com.dev.philo.fillsketch.core.database.schema.SketchSchema
-import io.realm.kotlin.Realm
-import io.realm.kotlin.ext.query
-import io.realm.kotlin.query.max
+import com.dev.philo.fillsketch.core.database.dao.DrawingEntityDao
+import com.dev.philo.fillsketch.core.database.dao.SettingEntityDao
+import com.dev.philo.fillsketch.core.database.dao.SketchEntityDao
+import com.dev.philo.fillsketch.core.database.entity.DrawingEntity
+import com.dev.philo.fillsketch.core.database.entity.SettingEntity
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FillSketchDataSource @Inject constructor(
-    private val realm: Realm
+    private val settingEntityDao: SettingEntityDao,
+    private val sketchEntityDao: SketchEntityDao,
+    private val drawingEntityDao: DrawingEntityDao,
 ) {
 
-    val settings = realm
-        .query<SettingSchema>()
-        .asFlow()
-        .map { it.list.toList().first() }
+    val settings = settingEntityDao.getSettings().map { it ?: SettingEntity() }
 
-    val sketchList = realm
-        .query<SketchSchema>()
-        .asFlow()
-        .map { it.list.toList() }
+    val sketchList = sketchEntityDao.getAllSketch()
 
-    val drawingResultList = realm
-        .query<DrawingResultSchema>()
-        .asFlow()
-        .map { it.list.toList().reversed() }
+    val drawingResultList = drawingEntityDao.getAllDrawing().map { it.reversed() }
 
     fun getMagicBrushStateBySketchType(sketchType: Int) =
-        realm.query<SketchSchema>("sketchType == $0", sketchType).asFlow()
-            .map { it.list.first().hasMagicBrush }
+        sketchEntityDao.getSketchBySketchType(sketchType).map { it.hasMagicBrush }
 
-    fun getDrawingResultById(drawingResultId: Int) =
-        realm.query<DrawingResultSchema>("_id == $0", drawingResultId).asFlow()
-            .map { it.list.first() }
+    fun getDrawingResultById(drawingResultId: Long) =
+        drawingEntityDao.getDrawingById(drawingResultId)
 
-    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Int {
-
-        val id = getNextDrawingResultPrimaryKey()
-
-        realm.write {
-            copyToRealm(
-                DrawingResultSchema().apply {
-                    this._id = id
-                    this.sketchType = sketchType
-                    this.latestMaskBitmapByteArray = latestByteArray
-                }
+    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Long {
+        return drawingEntityDao.insert(
+            DrawingEntity(
+                sketchType = sketchType,
+                latestMaskBitmapByteArray = latestByteArray
             )
-        }
-
-        return id
+        )
     }
 
     suspend fun updateBackgroundMusicSetting() {
-        realm.write {
-            val setting = query<SettingSchema>().find().first()
-            setting.backgroundMusic = !setting.backgroundMusic
-        }
+        settingEntityDao.update(
+            settings.first().let {
+                it.copy(
+                    backgroundMusic = !it.backgroundMusic
+                )
+            }
+        )
     }
 
     suspend fun updateSoundEffectSetting() {
-        realm.write {
-            val setting = query<SettingSchema>().find().first()
-            setting.soundEffect = !setting.soundEffect
-        }
+        settingEntityDao.update(
+            settings.first().let {
+                it.copy(
+                    soundEffect = !it.soundEffect
+                )
+            }
+        )
     }
 
     suspend fun updateLockState(sketchType: Int, isLocked: Boolean = false) {
-        realm.write {
-            val sketch = query<SketchSchema>("sketchType == $0", sketchType).find().first()
-            sketch.isLocked = isLocked
-        }
+        sketchEntityDao.update(
+            sketchEntityDao.getSketchBySketchType(sketchType).first().copy(
+                isLocked = isLocked
+            )
+        )
     }
 
     suspend fun updateMagicBrushState(sketchType: Int, hasMagicBrush: Boolean = true) {
-        realm.write {
-            val sketch = query<SketchSchema>("sketchType == $0", sketchType).find().first()
-            sketch.hasMagicBrush = hasMagicBrush
-        }
+        sketchEntityDao.update(
+            sketchEntityDao.getSketchBySketchType(sketchType).first().copy(
+                hasMagicBrush = hasMagicBrush
+            )
+        )
     }
 
     suspend fun updateDrawingResult(
-        drawingResultId: Int,
+        drawingResultId: Long,
         latestMaskBitmapByteArray: ByteArray,
         resultBitmapByteArray: ByteArray,
     ) {
-        realm.write {
-            val drawingResult =
-                query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
-            drawingResult.latestMaskBitmapByteArray = latestMaskBitmapByteArray
-            drawingResult.resultBitmapByteArray = resultBitmapByteArray
-        }
+        drawingEntityDao.update(
+            drawingEntityDao.getDrawingById(drawingResultId).first().copy(
+                latestMaskBitmapByteArray = latestMaskBitmapByteArray,
+                resultBitmapByteArray = resultBitmapByteArray
+            )
+        )
     }
 
-    suspend fun deleteDrawingResult(drawingResultId: Int) {
-        realm.write {
-            val drawingResult =
-                query<DrawingResultSchema>("_id == $0", drawingResultId).find().first()
-            delete(drawingResult)
-        }
-    }
-
-    private fun getNextDrawingResultPrimaryKey(): Int {
-        val maxId = realm.query<DrawingResultSchema>().max<Int>("_id").find() ?: 0
-        return maxId + 1
+    suspend fun deleteDrawingResult(drawingResultId: Long) {
+        drawingEntityDao.deleteDrawingById(drawingResultId)
     }
 }

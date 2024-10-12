@@ -32,7 +32,7 @@ class DrawingResultViewModel @Inject constructor(
 
     fun fetchDrawingUiState(
         sketchType: Int,
-        drawingResultId: Int,
+        drawingResultId: Long,
         dpi: Int
     ) {
         viewModelScope.launch {

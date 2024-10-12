@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import com.dev.philo.fillsketch.core.model.DrawingResult
 
 data class MyWork(
-    val id: Int = 0,
+    val id: Long = 0,
     val sketchType: Int = 0,
     val resultBitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
     val hasMagicBrush: Boolean = false

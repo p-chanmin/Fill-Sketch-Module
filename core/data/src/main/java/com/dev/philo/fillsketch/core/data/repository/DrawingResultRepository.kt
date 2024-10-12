@@ -10,12 +10,12 @@ import javax.inject.Inject
 class DrawingResultRepository @Inject constructor(
     private val fillSketchDataSource: FillSketchDataSource
 ) {
-    fun getDrawingResult(sketchType: Int, drawingResultId: Int): Flow<DrawingResult> =
+    fun getDrawingResult(sketchType: Int, drawingResultId: Long): Flow<DrawingResult> =
         fillSketchDataSource
             .getDrawingResultById(drawingResultId)
             .map {
                 DrawingResult(
-                    id = it._id,
+                    id = it.id,
                     sketchType = it.sketchType,
                     latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
                     resultBitmapByteArray = it.resultBitmapByteArray,
@@ -32,7 +32,7 @@ class DrawingResultRepository @Inject constructor(
     }
 
     suspend fun updateDrawingResult(
-        drawingResultId: Int,
+        drawingResultId: Long,
         latestMaskBitmapByteArray: ByteArray,
         resultBitmapByteArray: ByteArray
     ) {

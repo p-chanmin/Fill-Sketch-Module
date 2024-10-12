@@ -57,10 +57,10 @@ import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 fun DrawingResultScreen(
     paddingValues: PaddingValues,
     sketchType: Int,
-    drawingResultId: Int,
+    drawingResultId: Long,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: (Int, Int) -> Unit,
+    navigateToDrawing: (Int, Long) -> Unit,
     navigateToMyWorks: () -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
     showInterstitialRewardAd: () -> Unit,

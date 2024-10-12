@@ -25,13 +25,13 @@ internal class MainNavigator(
         navController.navigateToMyWorks()
     }
 
-    fun navigateToDrawing(sketchType: Int, drawingResultId: Int) {
+    fun navigateToDrawing(sketchType: Int, drawingResultId: Long) {
         navController.popBackStack<Route.Drawing>(inclusive = true)
         navController.popBackStack<Route.DrawingResult>(inclusive = true)
         navController.navigateToDrawing(sketchType, drawingResultId)
     }
 
-    fun navigateToDrawingResult(sketchType: Int, drawingResultId: Int) {
+    fun navigateToDrawingResult(sketchType: Int, drawingResultId: Long) {
         navController.navigateToDrawingResult(sketchType, drawingResultId)
     }
 

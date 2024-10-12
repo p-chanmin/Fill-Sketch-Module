@@ -1,6 +1,6 @@
 plugins {
     id("philo.fillsketch.android.library")
-    id("philo.fillsketch.android.realm")
+    id("philo.fillsketch.android.room")
 }
 
 android {

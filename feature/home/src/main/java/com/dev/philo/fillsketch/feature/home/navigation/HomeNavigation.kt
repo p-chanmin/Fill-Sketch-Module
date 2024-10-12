@@ -25,8 +25,8 @@ fun NavGraphBuilder.homeNavGraph(
     onBackClick: () -> Unit,
     navigateToSketchList: () -> Unit,
     navigateToMyWorks: () -> Unit,
-    navigateToDrawing: (Int, Int) -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit,
+    navigateToDrawing: (Int, Long) -> Unit,
+    navigateToDrawingResult: (Int, Long) -> Unit,
     showSketchRewardAd: (() -> Unit, () -> Unit) -> Unit,
 ) {
     composable<Route.Home> {

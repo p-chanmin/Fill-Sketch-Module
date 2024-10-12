@@ -1,54 +1,68 @@
 package com.dev.philo.fillsketch.core.database.di
 
+import android.content.Context
+import androidx.room.Room
 import com.dev.philo.fillsketch.asset.SketchResource
-import com.dev.philo.fillsketch.core.database.schema.DrawingResultSchema
-import com.dev.philo.fillsketch.core.database.schema.SettingSchema
-import com.dev.philo.fillsketch.core.database.schema.SketchSchema
+import com.dev.philo.fillsketch.core.database.FillSketchDatabase
+import com.dev.philo.fillsketch.core.database.entity.SettingEntity
+import com.dev.philo.fillsketch.core.database.entity.SketchEntity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import io.realm.kotlin.Realm
-import io.realm.kotlin.RealmConfiguration
-import io.realm.kotlin.ext.query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
-
     @Provides
     @Singleton
-    fun provideRealm(): Realm {
-        val config = RealmConfiguration
-            .Builder(
-                schema = setOf(
-                    SettingSchema::class,
-                    SketchSchema::class,
-                    DrawingResultSchema::class,
-                )
-            ).name("fillsketch.realm")
-            .schemaVersion(1)
-            .deleteRealmIfMigrationNeeded() // develop only
-            .build()
+    fun provideFillSketchDatabase(
+        @ApplicationContext context: Context,
+    ): FillSketchDatabase {
+        val db = Room.databaseBuilder(
+            context = context,
+            FillSketchDatabase::class.java,
+            "fill_sketch_database.db"
+        ).build()
 
-        val realm = Realm.open(config)
-
-        realm.writeBlocking {
-            if (query<SettingSchema>().find().firstOrNull() == null) {
-                copyToRealm(SettingSchema())
+        CoroutineScope(Dispatchers.IO).launch {
+            if (db.settingEntityDao().getSettings().firstOrNull() == null) {
+                db.settingEntityDao().insert(SettingEntity())
             }
 
-            if (query<SketchSchema>().find().firstOrNull() == null) {
+            if (db.sketchEntityDao().getAllSketch()
+                    .first().size != SketchResource.sketchOutlineResourceIds.size
+            ) {
+                db.sketchEntityDao().deleteAllSketch()
                 SketchResource.sketchOutlineResourceIds.forEachIndexed { i, _ ->
-                    copyToRealm(SketchSchema().apply {
-                        sketchType = i
-                        isLocked = (i - 1) % 4 == 0 || (i - 1) % 4 == 1
-                    })
+                    db.sketchEntityDao().insert(
+                        SketchEntity(
+                            sketchType = i,
+                            isLocked = (i - 1) % 4 == 0 || (i - 1) % 4 == 1
+                        )
+                    )
                 }
             }
         }
-
-        return realm
+        return db
     }
+
+    @Provides
+    fun provideSettingEntityDao(fillSketchDatabase: FillSketchDatabase) =
+        fillSketchDatabase.settingEntityDao()
+
+    @Provides
+    fun provideSketchEntityDao(fillSketchDatabase: FillSketchDatabase) =
+        fillSketchDatabase.sketchEntityDao()
+
+    @Provides
+    fun provideDrawingEntityDao(fillSketchDatabase: FillSketchDatabase) =
+        fillSketchDatabase.drawingEntityDao()
 }

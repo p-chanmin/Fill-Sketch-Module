@@ -1,12 +1,8 @@
 package com.dev.philo.fillsketch.core.data.repository
 
-import com.dev.philo.fillsketch.core.data.converter.PathDataAdapter
 import com.dev.philo.fillsketch.core.database.datasource.FillSketchDataSource
 import com.dev.philo.fillsketch.core.model.DrawingResult
-import com.dev.philo.fillsketch.core.model.PathData
 import com.dev.philo.fillsketch.core.model.Sketch
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -14,12 +10,6 @@ import javax.inject.Inject
 class SketchRepository @Inject constructor(
     private val fillSketchDataSource: FillSketchDataSource
 ) {
-
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(PathData::class.java, PathDataAdapter())
-        .create()
-    private val type = object : TypeToken<List<PathData>>() {}.type
-
     fun getSketch(): Flow<List<Sketch>> = fillSketchDataSource.sketchList
         .map { sketchSchemaList ->
             sketchSchemaList.map {
@@ -36,7 +26,7 @@ class SketchRepository @Inject constructor(
             .map { drawingResultList ->
                 drawingResultList.map {
                     DrawingResult(
-                        id = it._id,
+                        id = it.id,
                         sketchType = it.sketchType,
                         latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
                         resultBitmapByteArray = it.resultBitmapByteArray
@@ -49,7 +39,7 @@ class SketchRepository @Inject constructor(
             .map { myWorkSchemaList ->
                 myWorkSchemaList.filter { it.sketchType == sketchType }.map {
                     DrawingResult(
-                        id = it._id,
+                        id = it.id,
                         sketchType = it.sketchType,
                         latestMaskBitmapByteArray = it.latestMaskBitmapByteArray,
                         resultBitmapByteArray = it.resultBitmapByteArray
@@ -57,11 +47,11 @@ class SketchRepository @Inject constructor(
                 }
             }
 
-    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Int {
+    suspend fun addDrawingResult(sketchType: Int, latestByteArray: ByteArray): Long {
         return fillSketchDataSource.addDrawingResult(sketchType, latestByteArray)
     }
 
-    suspend fun deleteDrawingResult(drawingResultId: Int) {
+    suspend fun deleteDrawingResult(drawingResultId: Long) {
         fillSketchDataSource.deleteDrawingResult(drawingResultId)
     }
 

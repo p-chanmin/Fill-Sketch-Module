@@ -10,11 +10,11 @@ import com.dev.philo.fillsketch.core.navigation.Route
 import com.dev.philo.fillsketch.feature.drawing.screen.DrawingResultScreen
 import com.dev.philo.fillsketch.feature.drawing.screen.DrawingScreen
 
-fun NavController.navigateToDrawing(sketchType: Int, drawingResultId: Int) {
+fun NavController.navigateToDrawing(sketchType: Int, drawingResultId: Long) {
     navigate(Route.Drawing(sketchType, drawingResultId))
 }
 
-fun NavController.navigateToDrawingResult(sketchType: Int, drawingResultId: Int) {
+fun NavController.navigateToDrawingResult(sketchType: Int, drawingResultId: Long) {
     navigate(Route.DrawingResult(sketchType, drawingResultId))
 }
 
@@ -23,8 +23,8 @@ fun NavGraphBuilder.drawingNavGraph(
     playSoundEffect: (SoundEffect) -> Unit = {},
     onShowErrorSnackBar: (String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawing: (Int, Int) -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit,
+    navigateToDrawing: (Int, Long) -> Unit,
+    navigateToDrawingResult: (Int, Long) -> Unit,
     navigateToMyWorks: () -> Unit,
     showMagicRewardAd: (() -> Unit, () -> Unit) -> Unit,
     showInterstitialRewardAd: () -> Unit,

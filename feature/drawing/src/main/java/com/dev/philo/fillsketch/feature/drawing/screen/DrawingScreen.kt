@@ -69,10 +69,10 @@ import com.dev.philo.fillsketch.core.designsystem.R as DesignSystemR
 fun DrawingScreen(
     paddingValues: PaddingValues,
     sketchType: Int,
-    drawingResultId: Int,
+    drawingResultId: Long,
     onShowErrorSnackBar: (message: String) -> Unit,
     onBackClick: () -> Unit,
-    navigateToDrawingResult: (Int, Int) -> Unit,
+    navigateToDrawingResult: (Int, Long) -> Unit,
     playSoundEffect: (SoundEffect) -> Unit = {},
     showMagicRewardAd: (() -> Unit, () -> Unit) -> Unit,
     drawingViewModel: DrawingViewModel = hiltViewModel()

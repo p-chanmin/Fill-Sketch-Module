@@ -38,7 +38,7 @@ class MyWorksViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun deleteMyWork(drawingResultId: Int) {
+    fun deleteMyWork(drawingResultId: Long) {
         viewModelScope.launch {
             sketchRepository.deleteDrawingResult(drawingResultId)
         }

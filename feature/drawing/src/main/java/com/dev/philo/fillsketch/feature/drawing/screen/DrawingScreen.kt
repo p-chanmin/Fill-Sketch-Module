@@ -154,8 +154,8 @@ fun DrawingContent(
             scale = scale,
             offset = offset,
             onDrag = { pan, zoom ->
-                scale = (scale * zoom).coerceIn(minScale, maxScale)
                 offset = Offset((offset.x + pan.x * scale), (offset.y + pan.y * scale))
+                zoom?.let { scale = (scale * it).coerceIn(minScale, maxScale) }
             },
             drawingUiState = drawingUiState,
             insertNewPath = insertNewPath,
@@ -308,7 +308,7 @@ fun DrawingContent(
 fun DrawingCanvas(
     scale: Float,
     offset: Offset,
-    onDrag: (Offset, Float) -> Unit,
+    onDrag: (Offset, Float?) -> Unit,
     modifier: Modifier = Modifier,
     drawingUiState: DrawingUiState,
     insertNewPath: (Offset) -> Unit,
@@ -349,20 +349,29 @@ fun DrawingCanvas(
                             ActionType.BRUSH, ActionType.ERASER, ActionType.MAGIC_BRUSH -> {
                                 awaitEachGesture {
                                     val start = awaitFirstDown()
+                                    var firstDotFlag = false
                                     val startOffset = Offset(
                                         drawingUiState.width * start.position.x / canvasSize.width,
                                         drawingUiState.height * start.position.y / canvasSize.height
                                     )
-                                    insertNewPath(startOffset)
-                                    updateLatestPath(startOffset)
-
+                                    val event = awaitPointerEvent()
                                     drag(start.id) { change ->
-                                        val calculatedOffset = Offset(
-                                            drawingUiState.width * change.position.x / canvasSize.width,
-                                            drawingUiState.height * change.position.y / canvasSize.height
-                                        )
-                                        change.consume()
-                                        updateLatestPath(calculatedOffset)
+                                        if (event.changes.size == 1) {
+                                            if (!firstDotFlag) {
+                                                insertNewPath(startOffset)
+                                                updateLatestPath(startOffset)
+                                                firstDotFlag = true
+                                            }
+                                            val calculatedOffset = Offset(
+                                                drawingUiState.width * change.position.x / canvasSize.width,
+                                                drawingUiState.height * change.position.y / canvasSize.height
+                                            )
+                                            change.consume()
+                                            updateLatestPath(calculatedOffset)
+                                        } else {
+                                            onDrag(change.position - change.previousPosition, null)
+                                            change.consume()
+                                        }
                                     }
                                     drawOnNewMask()
                                 }

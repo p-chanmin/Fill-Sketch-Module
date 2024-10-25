@@ -1,7 +1,8 @@
-package com.dev.philo.fillsketch.feature.main
+package com.dev.philo.fillsketch.feature.main.manager
 
 import android.app.Activity
 import android.content.Context
+import com.dev.philo.fillsketch.feature.main.BuildConfig
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd

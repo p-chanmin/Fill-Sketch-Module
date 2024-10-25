@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.drawing.navigation.drawingNavGraph
 import com.dev.philo.fillsketch.feature.home.navigation.homeNavGraph
-import com.dev.philo.fillsketch.feature.main.AdMobManager
+import com.dev.philo.fillsketch.feature.main.manager.AdMobManager
 import com.dev.philo.fillsketch.feature.main.MainNavigator
 
 @Composable

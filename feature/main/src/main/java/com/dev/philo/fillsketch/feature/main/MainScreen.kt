@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import com.dev.philo.fillsketch.core.model.SoundEffect
 import com.dev.philo.fillsketch.feature.main.component.MainNavHost
+import com.dev.philo.fillsketch.feature.main.manager.AdMobManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView

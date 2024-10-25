@@ -1,4 +1,4 @@
-package com.dev.philo.fillsketch.feature.main
+package com.dev.philo.fillsketch.feature.main.manager
 
 import android.content.Context
 import android.media.SoundPool

@@ -11,3 +11,4 @@ local.properties
 mendable.jar
 index.html
 /app
+/settings.gradle.kts

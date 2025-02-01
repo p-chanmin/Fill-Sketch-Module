@@ -32,7 +32,7 @@ Multi-module 아키텍처 설계를 통해 여러 앱에 적용되어 있으며,
 |                          **매직펜**                          |                       **팔레트 조정**                        |                        **화면 이동**                         |
 | <img src="https://github.com/user-attachments/assets/09213f91-2e14-4e92-9a6c-81c9924591a9" width="200"> | <img src="https://github.com/user-attachments/assets/6dc6b1e5-e9b6-46f9-a192-2b9f2d26b026" width="200"> | <img src="https://github.com/user-attachments/assets/8b09000f-3bfa-4a7c-bc32-023aa531da4c" width="200"> |
 |                      **Image Dropper**                       |                       **스케치 저장**                        |                       **작업물 목록**                        |
-| <img src="https://github.com/user-attachments/assets/5c00647e-9e4d-4908-9eb7-084cc6082e7d" width="200"> | <img src="https://github.com/user-attachments/assets/fd0af87d-4e46-4a99-8dbd-85a6900a25b4" width="200"> | <img src="https://github.com/user-attachments/assets/a1e233c1-8a50-4a52-91da-4cb3b892d33f" width="200"> |
+| <img src="https://github.com/user-attachments/assets/5c00647e-9e4d-4908-9eb7-084cc6082e7d" width="200"> | <img src="https://github.com/user-attachments/assets/6d104915-0283-4139-b1eb-5f3c70d5b7fc" width="200"> | <img src="https://github.com/user-attachments/assets/a1e233c1-8a50-4a52-91da-4cb3b892d33f" width="200"> |
 
 <br>
 

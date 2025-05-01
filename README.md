@@ -38,12 +38,17 @@ Multi-module 아키텍처 설계를 통해 여러 앱에 적용되어 있으며,
 
 ## 📲 Download
 
-**Google Play Store**에서 최신 버전의 앱을 다운로드 하실 수 있습니다.
+[**Google Play Store**](https://play.google.com/store/apps/details?id=com.oldogz.fillsketch_princess)에서 최신 버전의 앱을 다운로드 하실 수 있습니다.
 
-| <img src="https://github.com/user-attachments/assets/be195b6e-6734-447c-8af8-da521d5e2b6c" width="100"> | [**Fill Sketch - Princess**](https://play.google.com/store/apps/details?id=com.oldogz.fillsketch_princess) |
-| ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img src="https://github.com/user-attachments/assets/06fba994-5308-4ef7-a667-281c88e39a35" width="100"> | [**Fill Sketch - Fairy**](https://play.google.com/store/apps/details?id=com.oldogz.fillsketch_fairy) |
-| <img src="https://github.com/user-attachments/assets/e70d3ca6-2297-4317-87d5-40eef34ef24c" width="100"> | [**Fill Sketch - Prince**](https://play.google.com/store/apps/details?id=com.oldogz.fillsketch_prince) |
+
+
+<br>
+
+## 📢 Trouble Shooting
+
+- [**실시간 드로잉 렌더링 개선 과정 및 성능 분석**](https://oldogz7358.tistory.com/2)
+
+
 
 <br>
 

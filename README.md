@@ -60,13 +60,13 @@ Multi-module 아키텍처 설계를 통해 여러 앱에 적용되어 있으며,
 
 ## 📄 기술 스택
 
-| 분류                    | Stack              |
-| ----------------------- | ------------------ |
-| App Architechture       | Clean Architecture |
-| Design Pattern          | MVVM               |
-| DI                      | Hilt               |
-| UI                      | Jetpack Compose    |
-| Local Storage           | Room               |
-| serializer/deserializer | Gson               |
-| Asynchronous            | Coroutines, Flow   |
+| 분류                    | Stack            |
+| ----------------------- | ---------------- |
+| App Architechture       | App Architecture |
+| Design Pattern          | MVVM             |
+| DI                      | Hilt             |
+| UI                      | Jetpack Compose  |
+| Local Storage           | Room             |
+| serializer/deserializer | Gson             |
+| Asynchronous            | Coroutines, Flow |
 
